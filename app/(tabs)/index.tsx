@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Activity, Beaker, MessageCircle, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap } from 'lucide-react-native';
+import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower } from 'lucide-react-native';
 import GlowwScore from '@/components/GlowwScore';
 import OrganDashboard from '@/components/OrganDashboard';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
@@ -8,13 +8,28 @@ import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 export default function HomeScreen() {
   const router = useRouter();
 
-  // Sample organ data
+  // Calculate dynamic Gloww Score based on organ health
   const organs = [
     { name: 'Uterus', status: 'healing' as const, progress: 30, color: colors.reproductive.uterus },
     { name: 'Ovaries', status: 'balanced' as const, progress: 75, color: colors.reproductive.ovaries },
     { name: 'Thyroid', status: 'rising' as const, progress: 60, color: colors.reproductive.thyroid },
     { name: 'Stress', status: 'rising' as const, progress: 45, color: colors.reproductive.stress },
   ];
+
+  // Calculate overall Gloww Score
+  const overallScore = Math.round(organs.reduce((sum, organ) => sum + organ.progress, 0) / organs.length);
+  const getScoreStatus = (score: number) => {
+    if (score >= 80) return "Excellent reproductive health! 🌟";
+    if (score >= 60) return "Good progress, keep nurturing yourself 💕";
+    if (score >= 40) return "Healing journey in progress 🌱";
+    return "Focus on self-care and wellness 🌸";
+  };
+  const getScoreDescription = (score: number) => {
+    if (score >= 80) return "Your reproductive system is thriving. Maintain your healthy habits!";
+    if (score >= 60) return "You're doing great! Small improvements will boost your score even more.";
+    if (score >= 40) return "Your body is healing beautifully. Every small step counts.";
+    return "Start with gentle self-care practices. Your body is ready to heal.";
+  };
 
   const handleOrganPress = (organ: any) => {
     // Navigate to organ details
@@ -32,9 +47,9 @@ export default function HomeScreen() {
         <Text style={styles.title}>Heal Your{'\n'}Reproductive Core</Text>
 
         <GlowwScore 
-          score={72} 
-          status="Balanced but stress rising" 
-          description="Your reproductive system is healing. Focus on stress management for optimal balance."
+          score={overallScore} 
+          status={getScoreStatus(overallScore)} 
+          description={getScoreDescription(overallScore)}
         />
 
         <OrganDashboard organs={organs} onOrganPress={handleOrganPress} />
@@ -52,89 +67,155 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.quickActions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={styles.actionIcon}>
-              <Activity size={24} color={colors.nude.text} />
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => router.push('/track')}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.ovaries }]}>
+              <Calendar size={24} color={colors.nude.background} />
             </View>
-            <Text style={styles.actionLabel}>Track</Text>
+            <Text style={styles.actionLabel}>My Cycle</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={styles.actionIcon}>
-              <Beaker size={24} color={colors.nude.text} />
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => router.push('/track')}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.uterus }]}>
+              <Target size={24} color={colors.nude.background} />
             </View>
-            <Text style={styles.actionLabel}>Test</Text>
+            <Text style={styles.actionLabel}>Fertility</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={styles.actionIcon}>
-              <MessageCircle size={24} color={colors.nude.text} />
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => router.push('/test')}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.thyroid }]}>
+              <Beaker size={24} color={colors.nude.background} />
             </View>
-            <Text style={styles.actionLabel}>Coach</Text>
+            <Text style={styles.actionLabel}>Health Tests</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={styles.actionIcon}>
-              <ShoppingBag size={24} color={colors.nude.text} />
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => router.push('/shop')}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.stress }]}>
+              <Flower size={24} color={colors.nude.background} />
             </View>
-            <Text style={styles.actionLabel}>Shop</Text>
+            <Text style={styles.actionLabel}>Wellness</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.sectionTitle}>Reproductive Wellness</Text>
+        <Text style={styles.sectionTitle}>Your Wellness Journey 💕</Text>
 
         <View style={styles.modesGrid}>
           <TouchableOpacity
             style={[styles.modeCard, { backgroundColor: colors.reproductive.uterus }]}
             onPress={() => router.push('/modes/fertility')}
           >
-            <Heart size={28} color={colors.nude.roseGold} />
-            <Text style={styles.modeLabel}>Fertility</Text>
-            <Text style={styles.modeScore}>72</Text>
+            <Heart size={28} color={colors.nude.background} />
+            <Text style={styles.modeLabel}>Fertility & Conception</Text>
+            <Text style={styles.modeScore}>{organs.find(o => o.name === 'Uterus')?.progress || 0}</Text>
+            <Text style={styles.modeSubtext}>Track your fertile days</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.modeCard, { backgroundColor: colors.reproductive.ovaries }]}
             onPress={() => router.push('/modes/cycle')}
           >
-            <Zap size={28} color={colors.nude.roseGold} />
-            <Text style={styles.modeLabel}>Cycle</Text>
-            <Text style={styles.modeScore}>68</Text>
+            <Calendar size={28} color={colors.nude.background} />
+            <Text style={styles.modeLabel}>Period & Cycle</Text>
+            <Text style={styles.modeScore}>{organs.find(o => o.name === 'Ovaries')?.progress || 0}</Text>
+            <Text style={styles.modeSubtext}>Monitor your cycle</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.modeCard, { backgroundColor: colors.reproductive.thyroid }]}
             onPress={() => router.push('/modes/hormones')}
           >
-            <Brain size={28} color={colors.nude.roseGold} />
-            <Text style={styles.modeLabel}>Hormones</Text>
-            <Text style={styles.modeScore}>75</Text>
+            <Brain size={28} color={colors.nude.background} />
+            <Text style={styles.modeLabel}>Hormone Balance</Text>
+            <Text style={styles.modeScore}>{organs.find(o => o.name === 'Thyroid')?.progress || 0}</Text>
+            <Text style={styles.modeSubtext}>Balance your hormones</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.modeCard, { backgroundColor: colors.reproductive.stress }]}
             onPress={() => router.push('/modes/stress')}
           >
-            <Sparkles size={28} color={colors.nude.roseGold} />
-            <Text style={styles.modeLabel}>Stress</Text>
-            <Text style={styles.modeScore}>45</Text>
+            <Flower size={28} color={colors.nude.background} />
+            <Text style={styles.modeLabel}>Self-Care & Stress</Text>
+            <Text style={styles.modeScore}>{organs.find(o => o.name === 'Stress')?.progress || 0}</Text>
+            <Text style={styles.modeSubtext}>Nurture your wellbeing</Text>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.expertCallCard}
-          onPress={() => router.push('/expert-call')}
-        >
-          <View style={styles.expertCallIcon}>
-            <Phone size={24} color={colors.nude.roseGold} />
-          </View>
-          <View style={styles.expertCallContent}>
-            <Text style={styles.expertCallTitle}>Talk to a Reproductive Health Expert</Text>
-            <Text style={styles.expertCallSubtitle}>
-              Book a 1-on-1 consultation with a reproductive wellness specialist
-            </Text>
-          </View>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.expertCallCard}
+              onPress={() => router.push('/doctors')}
+            >
+              <View style={styles.expertCallIcon}>
+                <Phone size={24} color={colors.nude.background} />
+              </View>
+              <View style={styles.expertCallContent}>
+                <Text style={styles.expertCallTitle}>💬 Chat with a Women's Health Expert</Text>
+                <Text style={styles.expertCallSubtitle}>
+                  Get personalized advice from certified reproductive health specialists
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.pregnancyCard}
+              onPress={() => router.push('/track')}
+            >
+              <View style={styles.pregnancyIcon}>
+                <Baby size={24} color={colors.nude.background} />
+              </View>
+              <View style={styles.pregnancyContent}>
+                <Text style={styles.pregnancyTitle}>🤱 Pregnancy & Baby Tracking</Text>
+                <Text style={styles.pregnancySubtitle}>
+                  Track your pregnancy journey and baby's growth week by week
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* New Feature Cards */}
+            <View style={styles.newFeaturesSection}>
+              <Text style={styles.sectionTitle}>Advanced Features</Text>
+              
+              <TouchableOpacity
+                style={styles.featureCard}
+                onPress={() => router.push('/analytics')}
+              >
+                <View style={styles.featureIcon}>
+                  <Brain size={24} color={colors.nude.roseGold} />
+                </View>
+                <View style={styles.featureContent}>
+                  <Text style={styles.featureTitle}>Predictive Analytics</Text>
+                  <Text style={styles.featureDescription}>
+                    AI-powered fertility predictions and health risk assessment
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.featureCard}
+                onPress={() => router.push('/premium')}
+              >
+                <View style={styles.featureIcon}>
+                  <Sparkles size={24} color={colors.nude.roseGold} />
+                </View>
+                <View style={styles.featureContent}>
+                  <Text style={styles.featureTitle}>Premium Services</Text>
+                  <Text style={styles.featureDescription}>
+                    Virtual consultations, health coaching, and personalized supplements
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
       </View>
     </ScrollView>
   );
@@ -285,7 +366,16 @@ const styles = StyleSheet.create({
   modeScore: {
     fontFamily: typography.fontFamily.semibold,
     fontSize: typography.size.xxl,
-    color: colors.nude.text,
+    color: colors.nude.background,
+    marginTop: spacing.xs,
+  },
+  modeSubtext: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.xs,
+    color: colors.nude.background,
+    opacity: 0.8,
+    marginTop: spacing.xs,
+    textAlign: 'center',
   },
   expertCallCard: {
     backgroundColor: colors.nude.card,
@@ -304,7 +394,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.nude.peach,
+    backgroundColor: colors.nude.roseGold,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -319,6 +409,83 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   expertCallSubtitle: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    lineHeight: 20,
+  },
+  newFeaturesSection: {
+    marginTop: spacing.xl,
+  },
+  featureCard: {
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: colors.nude.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  featureIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.nude.peach,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  featureContent: {
+    flex: 1,
+  },
+  featureTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    marginBottom: spacing.xs,
+  },
+  featureDescription: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    lineHeight: 20,
+  },
+  pregnancyCard: {
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+    shadowColor: colors.nude.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  pregnancyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.reproductive.uterus,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  pregnancyContent: {
+    flex: 1,
+  },
+  pregnancyTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    marginBottom: spacing.xs,
+  },
+  pregnancySubtitle: {
     fontFamily: typography.fontFamily.regular,
     fontSize: typography.size.sm,
     color: colors.nude.textSecondary,

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { ChevronLeft, Send, Sparkles } from 'lucide-react-native';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
+import AIHealthCoach from '@/components/AIHealthCoach';
 
 interface Message {
   id: number;
@@ -10,23 +11,26 @@ interface Message {
 }
 
 export default function CoachScreen() {
-  const [messages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "I've noticed your estrogens has been low for the past two weeks. Consider more plant based foods and sun exposure.",
-      isAI: true,
-    },
-    {
-      id: 2,
-      text: "Should I try a supplement?",
-      isAI: false,
-    },
-    {
-      id: 3,
-      text: "Yes: a supplement can help. I will generate a recommendation",
-      isAI: true,
-    },
-  ]);
+  const [showAI, setShowAI] = useState(false);
+
+  const handleAIAction = (action: string) => {
+    console.log('AI Action:', action);
+    // Handle AI actions like booking consultations, viewing insights, etc.
+  };
+
+  const handleChatMessage = (message: string) => {
+    console.log('Chat message:', message);
+    // Handle chat messages
+  };
+
+  if (showAI) {
+    return (
+      <AIHealthCoach 
+        onAction={handleAIAction}
+        onChatMessage={handleChatMessage}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -49,51 +53,32 @@ export default function CoachScreen() {
           </View>
         </View>
 
-        {messages.map((message) => (
-          <View
-            key={message.id}
-            style={[
-              styles.messageBubble,
-              message.isAI ? styles.aiBubble : styles.userBubble,
-            ]}
-          >
-            <Text
-              style={[
-                styles.messageText,
-                message.isAI ? styles.aiText : styles.userText,
-              ]}
-            >
-              {message.text}
-            </Text>
-          </View>
-        ))}
-
-        <View style={styles.upgradeCard}>
-          <View style={styles.upgradeIconContainer}>
-            <Sparkles size={20} color={colors.nude.roseGold} />
-          </View>
-          <View style={styles.upgradeContent}>
-            <Text style={styles.upgradeTitle}>Unlock Gloww+</Text>
-            <Text style={styles.upgradeText}>personalized routines</Text>
-          </View>
-          <TouchableOpacity style={styles.upgradeButton}>
-            <Text style={styles.upgradeButtonText}>Upgrade</Text>
-          </TouchableOpacity>
+        <View style={styles.welcomeCard}>
+          <Text style={styles.welcomeTitle}>Welcome to Your AI Health Coach</Text>
+          <Text style={styles.welcomeText}>
+            Get personalized insights, track your reproductive health, and receive expert recommendations.
+          </Text>
         </View>
+
+        <View style={styles.featureCard}>
+          <Text style={styles.featureTitle}>What I can help you with:</Text>
+          <View style={styles.featureList}>
+            <Text style={styles.featureItem}>• Track symptoms and patterns</Text>
+            <Text style={styles.featureItem}>• Predict fertility windows</Text>
+            <Text style={styles.featureItem}>• Recommend supplements</Text>
+            <Text style={styles.featureItem}>• Connect with specialists</Text>
+            <Text style={styles.featureItem}>• Analyze lab results</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity 
+          style={styles.startButton}
+          onPress={() => setShowAI(true)}
+        >
+          <Sparkles size={20} color={colors.nude.background} />
+          <Text style={styles.startButtonText}>Start AI Coaching</Text>
+        </TouchableOpacity>
       </ScrollView>
-
-      <View style={styles.inputContainer}>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Ask me anything..."
-            placeholderTextColor={colors.nude.textSecondary}
-          />
-          <TouchableOpacity style={styles.sendButton}>
-            <Send size={20} color={colors.nude.background} />
-          </TouchableOpacity>
-        </View>
-      </View>
     </View>
   );
 }
@@ -249,5 +234,69 @@ const styles = StyleSheet.create({
     backgroundColor: colors.nude.roseGold,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  welcomeCard: {
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+    shadowColor: colors.nude.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  welcomeTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.xl,
+    color: colors.nude.text,
+    marginBottom: spacing.sm,
+  },
+  welcomeText: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.base,
+    color: colors.nude.textSecondary,
+    lineHeight: 22,
+  },
+  featureCard: {
+    backgroundColor: colors.nude.peach,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  featureTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+    marginBottom: spacing.md,
+  },
+  featureList: {
+    gap: spacing.sm,
+  },
+  featureItem: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    lineHeight: 22,
+  },
+  startButton: {
+    backgroundColor: colors.nude.text,
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    shadowColor: colors.nude.text,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  startButtonText: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.background,
   },
 });

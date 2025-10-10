@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { ChevronLeft, Heart } from 'lucide-react-native';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
+import LabTestIntegration from '@/components/LabTestIntegration';
 
 interface TestCardProps {
   title: string;
@@ -35,70 +36,27 @@ function TestCard({ title, price, description, status }: TestCardProps) {
 }
 
 export default function TestScreen() {
+  const handleOrderTest = (testId: string) => {
+    console.log('Order test:', testId);
+    // Handle test ordering
+  };
+
+  const handleViewResults = (testId: string) => {
+    console.log('View results:', testId);
+    // Handle viewing test results
+  };
+
+  const handleTrackOrder = (orderId: string) => {
+    console.log('Track order:', orderId);
+    // Handle order tracking
+  };
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <ChevronLeft size={24} color={colors.nude.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Lab Testing</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
-      <View style={styles.content}>
-        <Text style={styles.subtitle}>
-          Order hormone tests from the comfort of your home
-        </Text>
-
-        <TestCard
-          title="Testosterone"
-          price="₹8,499"
-          description="Measure total and free testosterone levels to assess hormone balance"
-        />
-
-        <TestCard
-          title="Cortisol"
-          price="₹6,799"
-          description="Track stress hormone patterns throughout the day"
-          status="Sample shipped"
-        />
-
-        <TestCard
-          title="Thyroid Panel"
-          price="₹10,999"
-          description="Complete thyroid function analysis including TSH, T3, and T4"
-        />
-
-        <View style={styles.progressCard}>
-          <Text style={styles.progressTitle}>Test Progress</Text>
-          <View style={styles.progressSteps}>
-            <View style={styles.progressStep}>
-              <View style={[styles.progressDot, styles.progressDotComplete]} />
-              <Text style={styles.progressLabel}>Ordered</Text>
-            </View>
-            <View style={styles.progressLine} />
-            <View style={styles.progressStep}>
-              <View style={[styles.progressDot, styles.progressDotComplete]} />
-              <Text style={styles.progressLabel}>Shipped</Text>
-            </View>
-            <View style={styles.progressLine} />
-            <View style={styles.progressStep}>
-              <View style={styles.progressDot} />
-              <Text style={[styles.progressLabel, styles.progressLabelInactive]}>
-                Sample Received
-              </Text>
-            </View>
-            <View style={styles.progressLine} />
-            <View style={styles.progressStep}>
-              <View style={styles.progressDot} />
-              <Text style={[styles.progressLabel, styles.progressLabelInactive]}>
-                Results Ready
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    </ScrollView>
+    <LabTestIntegration 
+      onOrderTest={handleOrderTest}
+      onViewResults={handleViewResults}
+      onTrackOrder={handleTrackOrder}
+    />
   );
 }
 

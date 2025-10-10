@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { ChevronLeft, Activity, AlertTriangle, Heart, Brain, Zap } from 'lucide-react-native';
+import { ChevronLeft, Activity, AlertTriangle, Heart, Brain, Zap, Calendar, Baby, Target } from 'lucide-react-native';
 import ReproductiveSymptomsTracker from '@/components/ReproductiveSymptomsTracker';
 import PredictionEngine from '@/components/PredictionEngine';
+import PeriodCalendar from '@/components/PeriodCalendar';
+import FertilityPredictor from '@/components/FertilityPredictor';
+import PregnancyTracker from '@/components/PregnancyTracker';
+import FertileWindowCalendar from '@/components/FertileWindowCalendar';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 
 interface Symptom {
@@ -16,6 +20,7 @@ interface Symptom {
 export default function TrackScreen() {
   const [selectedSymptoms, setSelectedSymptoms] = useState<Symptom[]>([]);
   const [showPrediction, setShowPrediction] = useState(false);
+  const [trackingMode, setTrackingMode] = useState<'symptoms' | 'calendar' | 'fertility' | 'pregnancy' | 'fertile-window'>('symptoms');
 
   const handleSymptomsChange = (symptoms: Symptom[]) => {
     setSelectedSymptoms(symptoms);
@@ -30,6 +35,77 @@ export default function TrackScreen() {
     console.log('Connect with expert');
   };
 
+  const handleDatePress = (date: Date, day: any) => {
+    console.log('Date pressed:', date, day);
+  };
+
+  const handleAddPeriod = (date: Date) => {
+    console.log('Add period:', date);
+  };
+
+  const handleAddSymptom = (date: Date, symptom: string) => {
+    console.log('Add symptom:', date, symptom);
+  };
+
+  const handleViewInsights = () => {
+    console.log('View insights');
+  };
+
+  const handleLogData = (date: string, dataType: string, value: any) => {
+    console.log('Log data:', date, dataType, value);
+  };
+
+  const handleViewMilestones = () => {
+    console.log('View milestones');
+  };
+
+  const handleViewAppointments = () => {
+    console.log('View appointments');
+  };
+
+  // Sample data for demonstration
+  const cycleHistory = [
+    {
+      startDate: '2024-01-01',
+      endDate: '2024-01-28',
+      length: 28,
+      ovulationDay: 14,
+      lutealPhaseLength: 14,
+      symptoms: [],
+      basalBodyTemperature: [],
+      cervicalMucus: [],
+      periodFlow: [],
+      lhTests: []
+    }
+  ];
+
+  const currentCycleData = {
+    startDate: '2024-01-29',
+    endDate: '2024-02-25',
+    length: 28,
+    ovulationDay: 14,
+    lutealPhaseLength: 14,
+    symptoms: [],
+    basalBodyTemperature: [],
+    cervicalMucus: [],
+    periodFlow: [],
+    lhTests: []
+  };
+
+  const pregnancyData = {
+    conceptionDate: '2024-01-15',
+    dueDate: '2024-10-22',
+    currentWeek: 12,
+    currentDay: 3,
+    trimester: 1 as const,
+    weightGain: [],
+    symptoms: [],
+    appointments: [],
+    milestones: [],
+    babySize: [],
+    photos: []
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -40,12 +116,68 @@ export default function TrackScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      {!showPrediction ? (
+      {/* Tracking Mode Selector */}
+      <View style={styles.modeSelector}>
+        <TouchableOpacity 
+          style={[styles.modeButton, trackingMode === 'symptoms' && styles.activeModeButton]}
+          onPress={() => setTrackingMode('symptoms')}
+        >
+          <Activity size={20} color={trackingMode === 'symptoms' ? colors.nude.background : colors.nude.text} />
+          <Text style={[styles.modeButtonText, trackingMode === 'symptoms' && styles.activeModeButtonText]}>
+            Symptoms
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.modeButton, trackingMode === 'calendar' && styles.activeModeButton]}
+          onPress={() => setTrackingMode('calendar')}
+        >
+          <Calendar size={20} color={trackingMode === 'calendar' ? colors.nude.background : colors.nude.text} />
+          <Text style={[styles.modeButtonText, trackingMode === 'calendar' && styles.activeModeButtonText]}>
+            Calendar
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.modeButton, trackingMode === 'fertility' && styles.activeModeButton]}
+          onPress={() => setTrackingMode('fertility')}
+        >
+          <Target size={20} color={trackingMode === 'fertility' ? colors.nude.background : colors.nude.text} />
+          <Text style={[styles.modeButtonText, trackingMode === 'fertility' && styles.activeModeButtonText]}>
+            Fertility
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.modeButton, trackingMode === 'fertile-window' && styles.activeModeButton]}
+          onPress={() => setTrackingMode('fertile-window')}
+        >
+          <Target size={20} color={trackingMode === 'fertile-window' ? colors.nude.background : colors.nude.text} />
+          <Text style={[styles.modeButtonText, trackingMode === 'fertile-window' && styles.activeModeButtonText]}>
+            Fertile Window
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.modeButton, trackingMode === 'pregnancy' && styles.activeModeButton]}
+          onPress={() => setTrackingMode('pregnancy')}
+        >
+          <Baby size={20} color={trackingMode === 'pregnancy' ? colors.nude.background : colors.nude.text} />
+          <Text style={[styles.modeButtonText, trackingMode === 'pregnancy' && styles.activeModeButtonText]}>
+            Pregnancy
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Content based on selected mode */}
+      {trackingMode === 'symptoms' && !showPrediction && (
         <ReproductiveSymptomsTracker
           onSymptomsChange={handleSymptomsChange}
           onPredict={handlePredict}
         />
-      ) : (
+      )}
+
+      {trackingMode === 'symptoms' && showPrediction && (
         <View style={styles.predictionContainer}>
           <View style={styles.predictionHeader}>
             <TouchableOpacity 
@@ -62,6 +194,42 @@ export default function TrackScreen() {
             onConnectExpert={handleConnectExpert}
           />
         </View>
+      )}
+
+      {trackingMode === 'calendar' && (
+        <PeriodCalendar
+          onDatePress={handleDatePress}
+          onAddPeriod={handleAddPeriod}
+          onAddSymptom={handleAddSymptom}
+          onViewInsights={handleViewInsights}
+        />
+      )}
+
+      {trackingMode === 'fertility' && (
+        <FertilityPredictor
+          cycleHistory={cycleHistory}
+          currentCycleData={currentCycleData}
+          onLogData={handleLogData}
+          onViewInsights={handleViewInsights}
+        />
+      )}
+
+      {trackingMode === 'fertile-window' && (
+        <FertileWindowCalendar
+          cycleHistory={cycleHistory}
+          currentCycleData={currentCycleData}
+          onLogData={handleLogData}
+          onViewInsights={handleViewInsights}
+        />
+      )}
+
+      {trackingMode === 'pregnancy' && (
+        <PregnancyTracker
+          pregnancyData={pregnancyData}
+          onLogData={handleLogData}
+          onViewMilestones={handleViewMilestones}
+          onViewAppointments={handleViewAppointments}
+        />
       )}
 
       {!showPrediction && (
@@ -197,5 +365,38 @@ const styles = StyleSheet.create({
     fontSize: typography.size.sm,
     color: colors.nude.textSecondary,
     lineHeight: 20,
+  },
+  modeSelector: {
+    flexDirection: 'row',
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    margin: spacing.lg,
+    padding: spacing.xs,
+    shadowColor: colors.nude.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  modeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderRadius: borderRadius.md,
+    gap: spacing.xs,
+  },
+  activeModeButton: {
+    backgroundColor: colors.nude.text,
+  },
+  modeButtonText: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.sm,
+    color: colors.nude.text,
+  },
+  activeModeButtonText: {
+    color: colors.nude.background,
   },
 });
