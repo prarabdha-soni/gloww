@@ -1,12 +1,28 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower } from 'lucide-react-native';
+import { useState, useEffect } from 'react';
+import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower, Settings } from 'lucide-react-native';
 import GlowwScore from '@/components/GlowwScore';
 import OrganDashboard from '@/components/OrganDashboard';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [isNewUser, setIsNewUser] = useState(true);
+  const [userName, setUserName] = useState('');
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    // Check if user has completed onboarding
+    // In a real app, this would check local storage or API
+    const hasCompletedOnboarding = false; // This would come from storage
+    setIsNewUser(!hasCompletedOnboarding);
+    
+    if (hasCompletedOnboarding) {
+      // Load user data from storage
+      setUserName('Beautiful'); // Default name
+    }
+  }, []);
 
   // Calculate dynamic Gloww Score based on organ health
   const organs = [
@@ -36,6 +52,57 @@ export default function HomeScreen() {
     console.log('Organ pressed:', organ.name);
   };
 
+  const handleStartOnboarding = () => {
+    router.push('/welcome');
+  };
+
+  const renderNewUserWelcome = () => (
+    <View style={styles.newUserContainer}>
+      <View style={styles.welcomeCard}>
+        <View style={styles.welcomeIcon}>
+          <Sparkles size={32} color={colors.nude.roseGold} />
+        </View>
+        <Text style={styles.welcomeTitle}>Welcome to Gloww! 🌸</Text>
+        <Text style={styles.welcomeSubtitle}>
+          Your personalized reproductive wellness journey starts here
+        </Text>
+        <Text style={styles.welcomeDescription}>
+          Let's get to know you better so we can create the perfect wellness plan just for you
+        </Text>
+        
+        <TouchableOpacity 
+          style={styles.startOnboardingButton}
+          onPress={handleStartOnboarding}
+        >
+          <Text style={styles.startOnboardingText}>Get Started</Text>
+          <Sparkles size={20} color={colors.nude.background} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.featuresPreview}>
+        <Text style={styles.featuresTitle}>What you'll get:</Text>
+        <View style={styles.featureList}>
+          <View style={styles.featureItem}>
+            <Heart size={20} color={colors.reproductive.uterus} />
+            <Text style={styles.featureText}>Personalized Gloww Score</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Calendar size={20} color={colors.reproductive.ovaries} />
+            <Text style={styles.featureText}>Smart cycle tracking</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Target size={20} color={colors.reproductive.thyroid} />
+            <Text style={styles.featureText}>Fertility predictions</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Brain size={20} color={colors.reproductive.stress} />
+            <Text style={styles.featureText}>Health insights & tips</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -44,15 +111,23 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.title}>Heal Your{'\n'}Reproductive Core</Text>
+        {isNewUser ? (
+          renderNewUserWelcome()
+        ) : (
+          <>
+            <Text style={styles.title}>
+              Welcome back, {userName}! 💕{'\n'}Your Reproductive Wellness
+            </Text>
 
-        <GlowwScore 
-          score={overallScore} 
-          status={getScoreStatus(overallScore)} 
-          description={getScoreDescription(overallScore)}
-        />
+            <GlowwScore 
+              score={overallScore} 
+              status={getScoreStatus(overallScore)} 
+              description={getScoreDescription(overallScore)}
+            />
 
-        <OrganDashboard organs={organs} onOrganPress={handleOrganPress} />
+            <OrganDashboard organs={organs} onOrganPress={handleOrganPress} />
+          </>
+        )}
 
         <View style={styles.tipCard}>
           <View style={styles.tipIconContainer}>
@@ -490,5 +565,97 @@ const styles = StyleSheet.create({
     fontSize: typography.size.sm,
     color: colors.nude.textSecondary,
     lineHeight: 20,
+  },
+  newUserContainer: {
+    paddingBottom: spacing.xl,
+  },
+  welcomeCard: {
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+    shadowColor: colors.nude.text,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  welcomeIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.nude.peach,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  welcomeTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.xxl,
+    color: colors.nude.text,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  welcomeSubtitle: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+    lineHeight: 24,
+  },
+  welcomeDescription: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.base,
+    color: colors.nude.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: spacing.xl,
+  },
+  startOnboardingButton: {
+    backgroundColor: colors.nude.roseGold,
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    shadowColor: colors.nude.roseGold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  startOnboardingText: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.background,
+  },
+  featuresPreview: {
+    backgroundColor: colors.nude.peach,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+  },
+  featuresTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  featureList: {
+    gap: spacing.sm,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+  },
+  featureText: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    marginLeft: spacing.sm,
   },
 });
