@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ChevronLeft, Send, Sparkles } from 'lucide-react-native';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 import AIHealthCoach from '@/components/AIHealthCoach';
@@ -11,6 +12,7 @@ interface Message {
 }
 
 export default function CoachScreen() {
+  const router = useRouter();
   const [showAI, setShowAI] = useState(false);
 
   const handleAIAction = (action: string) => {
@@ -35,7 +37,10 @@ export default function CoachScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <ChevronLeft size={24} color={colors.nude.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>AI Gloww Assistant</Text>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ChevronLeft, Activity, AlertTriangle, Heart, Brain, Zap, Calendar, Baby, Target } from 'lucide-react-native';
 import ReproductiveSymptomsTracker from '@/components/ReproductiveSymptomsTracker';
 import PredictionEngine from '@/components/PredictionEngine';
@@ -18,6 +19,7 @@ interface Symptom {
 }
 
 export default function TrackScreen() {
+  const router = useRouter();
   const [selectedSymptoms, setSelectedSymptoms] = useState<Symptom[]>([]);
   const [showPrediction, setShowPrediction] = useState(false);
   const [trackingMode, setTrackingMode] = useState<'symptoms' | 'calendar' | 'fertility' | 'pregnancy' | 'fertile-window'>('symptoms');
@@ -109,7 +111,10 @@ export default function TrackScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <ChevronLeft size={24} color={colors.nude.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reproductive Health Flow</Text>

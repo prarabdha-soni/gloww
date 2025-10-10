@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ChevronLeft, Flame, Watch, Apple, Settings } from 'lucide-react-native';
 import CircularProgress from '@/components/CircularProgress';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const [isNudeTheme, setIsNudeTheme] = useState(true);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <ChevronLeft size={24} color={colors.nude.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>

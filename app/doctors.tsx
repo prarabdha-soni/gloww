@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { colors, typography, spacing } from '@/constants/theme';
 import HealthcareProviderNetwork from '@/components/HealthcareProviderNetwork';
 
 export default function DoctorsScreen() {
+  const router = useRouter();
+  
   const handleBookConsultation = (provider: any) => {
     console.log('Book consultation with:', provider.name);
     // Handle booking consultation
@@ -18,7 +21,10 @@ export default function DoctorsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <ChevronLeft size={24} color={colors.nude.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Healthcare Providers</Text>

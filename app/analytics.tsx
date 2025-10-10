@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { colors, typography, spacing } from '@/constants/theme';
 import PredictiveAnalytics from '@/components/PredictiveAnalytics';
 
 export default function AnalyticsScreen() {
+  const router = useRouter();
+  
   // Sample user data - in real app, this would come from state/API
   const userData = {
     cycleLength: 28,
@@ -28,7 +31,10 @@ export default function AnalyticsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <ChevronLeft size={24} color={colors.nude.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Predictive Analytics</Text>

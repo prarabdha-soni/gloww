@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ChevronLeft, Heart, Sparkles, Zap, Sunrise } from 'lucide-react-native';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 
@@ -79,10 +80,15 @@ function TierCard({ title, price, period, features, isPopular }: TierCardProps) 
 }
 
 export default function ShopScreen() {
+  const router = useRouter();
+  
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <ChevronLeft size={24} color={colors.nude.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Gloww Shop</Text>
