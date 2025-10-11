@@ -8,6 +8,7 @@ import PeriodCalendar from '@/components/PeriodCalendar';
 import FertilityPredictor from '@/components/FertilityPredictor';
 import PregnancyTracker from '@/components/PregnancyTracker';
 import FertileWindowCalendar from '@/components/FertileWindowCalendar';
+import PeriodTracker from '@/components/PeriodTracker';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 
 interface Symptom {
@@ -22,7 +23,7 @@ export default function TrackScreen() {
   const router = useRouter();
   const [selectedSymptoms, setSelectedSymptoms] = useState<Symptom[]>([]);
   const [showPrediction, setShowPrediction] = useState(false);
-  const [trackingMode, setTrackingMode] = useState<'symptoms' | 'calendar' | 'fertility' | 'pregnancy' | 'fertile-window'>('symptoms');
+  const [trackingMode, setTrackingMode] = useState<'symptoms' | 'calendar' | 'fertility' | 'pregnancy' | 'fertile-window' | 'period'>('period');
 
   const handleSymptomsChange = (symptoms: Symptom[]) => {
     setSelectedSymptoms(symptoms);
@@ -163,15 +164,25 @@ export default function TrackScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.modeButton, trackingMode === 'pregnancy' && styles.activeModeButton]}
-          onPress={() => setTrackingMode('pregnancy')}
-        >
-          <Baby size={20} color={trackingMode === 'pregnancy' ? colors.nude.background : colors.nude.text} />
-          <Text style={[styles.modeButtonText, trackingMode === 'pregnancy' && styles.activeModeButtonText]}>
-            Pregnancy
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.modeButton, trackingMode === 'pregnancy' && styles.activeModeButton]}
+              onPress={() => setTrackingMode('pregnancy')}
+            >
+              <Baby size={20} color={trackingMode === 'pregnancy' ? colors.nude.background : colors.nude.text} />
+              <Text style={[styles.modeButtonText, trackingMode === 'pregnancy' && styles.activeModeButtonText]}>
+                Pregnancy
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.modeButton, trackingMode === 'period' && styles.activeModeButton]}
+              onPress={() => setTrackingMode('period')}
+            >
+              <Heart size={20} color={trackingMode === 'period' ? colors.nude.background : colors.nude.text} />
+              <Text style={[styles.modeButtonText, trackingMode === 'period' && styles.activeModeButtonText]}>
+                Period
+              </Text>
+            </TouchableOpacity>
       </View>
 
       {/* Content based on selected mode */}
@@ -228,14 +239,21 @@ export default function TrackScreen() {
         />
       )}
 
-      {trackingMode === 'pregnancy' && (
-        <PregnancyTracker
-          pregnancyData={pregnancyData}
-          onLogData={handleLogData}
-          onViewMilestones={handleViewMilestones}
-          onViewAppointments={handleViewAppointments}
-        />
-      )}
+          {trackingMode === 'pregnancy' && (
+            <PregnancyTracker
+              pregnancyData={pregnancyData}
+              onLogData={handleLogData}
+              onViewMilestones={handleViewMilestones}
+              onViewAppointments={handleViewAppointments}
+            />
+          )}
+
+          {trackingMode === 'period' && (
+            <PeriodTracker
+              userId="demo-user-id" // In real app, get from user context
+              onPeriodAdded={() => console.log('Period added')}
+            />
+          )}
 
       {!showPrediction && (
         <View style={styles.quickInsights}>

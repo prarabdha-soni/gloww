@@ -34,6 +34,42 @@ export interface CycleData {
   createdAt: Date;
 }
 
+export interface PeriodData {
+  _id?: string;
+  userId: string;
+  startDate: string;
+  endDate: string;
+  duration: number; // in days
+  flow: 'light' | 'normal' | 'heavy' | 'very_heavy';
+  symptoms: string[];
+  painLevel: number; // 1-5 scale
+  mood: 'happy' | 'neutral' | 'sad' | 'anxious' | 'irritable';
+  notes?: string;
+  createdAt: Date;
+}
+
+export interface CyclePhase {
+  phase: 'menstrual' | 'follicular' | 'ovulation' | 'luteal';
+  startDate: string;
+  endDate: string;
+  description: string;
+  symptoms: string[];
+  recommendations: string[];
+}
+
+export interface PeriodPrediction {
+  nextPeriodDate: string;
+  nextOvulationDate: string;
+  fertileWindow: {
+    start: string;
+    end: string;
+  };
+  cyclePhase: CyclePhase;
+  confidence: number; // 0-100
+  daysUntilPeriod: number;
+  daysUntilOvulation: number;
+}
+
 export interface OrganHealth {
   _id?: string;
   userId: string;
@@ -591,6 +627,279 @@ export const getHealthInsights = async (userId: string): Promise<any[]> => {
   }
 };
 
+// Period tracking functions
+export const savePeriodData = async (periodData: Omit<PeriodData, '_id' | 'createdAt'>): Promise<string> => {
+  try {
+    const now = new Date();
+    const periodId = generateId();
+    
+    const period: PeriodData = {
+      ...periodData,
+      _id: periodId,
+      createdAt: now,
+    };
+
+    // Save to AsyncStorage
+    const existingPeriods = await AsyncStorage.getItem('userPeriods');
+    const periods = existingPeriods ? JSON.parse(existingPeriods) : [];
+    periods.push(period);
+    await AsyncStorage.setItem('userPeriods', JSON.stringify(periods));
+    
+    // Update cycle data
+    await updateCycleFromPeriod(periodData.userId, period);
+    
+    console.log('Period data saved:', period);
+    return periodId;
+  } catch (error) {
+    console.error('Error saving period data:', error);
+    throw error;
+  }
+};
+
+export const getUserPeriods = async (userId: string): Promise<PeriodData[]> => {
+  try {
+    const periodsData = await AsyncStorage.getItem('userPeriods');
+    if (periodsData) {
+      const allPeriods = JSON.parse(periodsData);
+      return allPeriods.filter((period: PeriodData) => period.userId === userId)
+        .sort((a: PeriodData, b: PeriodData) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching user periods:', error);
+    throw error;
+  }
+};
+
+export const getLastPeriod = async (userId: string): Promise<PeriodData | null> => {
+  try {
+    const periods = await getUserPeriods(userId);
+    return periods.length > 0 ? periods[0] : null;
+  } catch (error) {
+    console.error('Error fetching last period:', error);
+    throw error;
+  }
+};
+
+// Calculate cycle statistics
+export const getCycleStatistics = async (userId: string): Promise<any> => {
+  try {
+    const periods = await getUserPeriods(userId);
+    if (periods.length < 2) return null;
+
+    const cycleLengths = [];
+    const durations = [];
+    
+    for (let i = 0; i < periods.length - 1; i++) {
+      const currentPeriod = new Date(periods[i].startDate);
+      const nextPeriod = new Date(periods[i + 1].startDate);
+      const cycleLength = Math.floor((currentPeriod.getTime() - nextPeriod.getTime()) / (1000 * 60 * 60 * 24));
+      cycleLengths.push(Math.abs(cycleLength));
+      durations.push(periods[i].duration);
+    }
+
+    const avgCycleLength = Math.round(cycleLengths.reduce((sum, length) => sum + length, 0) / cycleLengths.length);
+    const avgDuration = Math.round(durations.reduce((sum, duration) => sum + duration, 0) / durations.length);
+    const cycleVariability = Math.max(...cycleLengths) - Math.min(...cycleLengths);
+
+    return {
+      averageCycleLength: avgCycleLength,
+      averageDuration: avgDuration,
+      cycleVariability,
+      totalPeriods: periods.length,
+      lastPeriod: periods[0],
+      isRegular: cycleVariability <= 7 // Regular if variation is 7 days or less
+    };
+  } catch (error) {
+    console.error('Error calculating cycle statistics:', error);
+    throw error;
+  }
+};
+
+// Predict next period
+export const predictNextPeriod = async (userId: string): Promise<PeriodPrediction> => {
+  try {
+    const statistics = await getCycleStatistics(userId);
+    const lastPeriod = await getLastPeriod(userId);
+    
+    if (!statistics || !lastPeriod) {
+      throw new Error('Insufficient data for prediction');
+    }
+
+    const lastPeriodDate = new Date(lastPeriod.startDate);
+    const nextPeriodDate = new Date(lastPeriodDate);
+    nextPeriodDate.setDate(nextPeriodDate.getDate() + statistics.averageCycleLength);
+    
+    const today = new Date();
+    const daysUntilPeriod = Math.ceil((nextPeriodDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Calculate ovulation (typically 14 days before next period)
+    const nextOvulationDate = new Date(nextPeriodDate);
+    nextOvulationDate.setDate(nextOvulationDate.getDate() - 14);
+    const daysUntilOvulation = Math.ceil((nextOvulationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Fertile window (5 days before ovulation)
+    const fertileStart = new Date(nextOvulationDate);
+    fertileStart.setDate(fertileStart.getDate() - 5);
+    const fertileEnd = new Date(nextOvulationDate);
+    fertileEnd.setDate(fertileEnd.getDate() + 1);
+    
+    // Determine current cycle phase
+    const cyclePhase = getCurrentCyclePhase(today, lastPeriodDate, statistics.averageCycleLength);
+    
+    // Calculate confidence based on cycle regularity
+    const confidence = statistics.isRegular ? 85 : 65;
+    
+    return {
+      nextPeriodDate: nextPeriodDate.toISOString().split('T')[0],
+      nextOvulationDate: nextOvulationDate.toISOString().split('T')[0],
+      fertileWindow: {
+        start: fertileStart.toISOString().split('T')[0],
+        end: fertileEnd.toISOString().split('T')[0]
+      },
+      cyclePhase,
+      confidence,
+      daysUntilPeriod,
+      daysUntilOvulation
+    };
+  } catch (error) {
+    console.error('Error predicting next period:', error);
+    throw error;
+  }
+};
+
+// Get current cycle phase
+const getCurrentCyclePhase = (today: Date, lastPeriodDate: Date, avgCycleLength: number): CyclePhase => {
+  const daysSincePeriod = Math.floor((today.getTime() - lastPeriodDate.getTime()) / (1000 * 60 * 60 * 24));
+  const cycleDay = daysSincePeriod % avgCycleLength;
+  
+  if (cycleDay <= 5) {
+    return {
+      phase: 'menstrual',
+      startDate: lastPeriodDate.toISOString().split('T')[0],
+      endDate: new Date(lastPeriodDate.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      description: 'Your menstrual phase - time for self-care and rest',
+      symptoms: ['Cramps', 'Fatigue', 'Mood changes'],
+      recommendations: ['Rest more', 'Stay hydrated', 'Gentle exercise', 'Warm compresses']
+    };
+  } else if (cycleDay <= 13) {
+    return {
+      phase: 'follicular',
+      startDate: new Date(lastPeriodDate.getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      endDate: new Date(lastPeriodDate.getTime() + 13 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      description: 'Your follicular phase - energy is building up',
+      symptoms: ['Increased energy', 'Better mood', 'Clear skin'],
+      recommendations: ['Exercise regularly', 'Eat iron-rich foods', 'Plan activities']
+    };
+  } else if (cycleDay <= 16) {
+    return {
+      phase: 'ovulation',
+      startDate: new Date(lastPeriodDate.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      endDate: new Date(lastPeriodDate.getTime() + 16 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      description: 'Your ovulation phase - peak fertility window',
+      symptoms: ['Increased libido', 'Cervical mucus changes', 'Mild cramping'],
+      recommendations: ['Track ovulation', 'Stay hydrated', 'Light exercise']
+    };
+  } else {
+    return {
+      phase: 'luteal',
+      startDate: new Date(lastPeriodDate.getTime() + 17 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      endDate: new Date(lastPeriodDate.getTime() + (avgCycleLength - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      description: 'Your luteal phase - preparing for next cycle',
+      symptoms: ['PMS symptoms', 'Bloating', 'Mood changes'],
+      recommendations: ['Reduce caffeine', 'Gentle exercise', 'Stress management']
+    };
+  }
+};
+
+// Update cycle data from period
+const updateCycleFromPeriod = async (userId: string, period: PeriodData): Promise<void> => {
+  try {
+    const existingCycles = await AsyncStorage.getItem('userCycles');
+    const cycles = existingCycles ? JSON.parse(existingCycles) : [];
+    
+    // Find or create current cycle
+    let currentCycle = cycles.find((c: any) => c.userId === userId && !c.endDate);
+    if (!currentCycle) {
+      currentCycle = {
+        _id: generateId(),
+        userId,
+        startDate: period.startDate,
+        endDate: null,
+        length: 0,
+        symptoms: [],
+        basalBodyTemperature: [],
+        cervicalMucus: [],
+        periodFlow: [],
+        lhTests: [],
+        createdAt: new Date()
+      };
+      cycles.push(currentCycle);
+    }
+    
+    // Update cycle with period data
+    currentCycle.periodFlow.push({
+      date: period.startDate,
+      flow: period.flow
+    });
+    
+    // If this is the end of the period, calculate cycle length
+    if (period.endDate) {
+      const startDate = new Date(currentCycle.startDate);
+      const endDate = new Date(period.endDate);
+      currentCycle.length = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      currentCycle.endDate = period.endDate;
+    }
+    
+    await AsyncStorage.setItem('userCycles', JSON.stringify(cycles));
+  } catch (error) {
+    console.error('Error updating cycle from period:', error);
+    throw error;
+  }
+};
+
+// Get daily period prediction notification
+export const getDailyPrediction = async (userId: string): Promise<any> => {
+  try {
+    const prediction = await predictNextPeriod(userId);
+    const today = new Date().toISOString().split('T')[0];
+    
+    let message = '';
+    let type = 'info';
+    
+    if (prediction.daysUntilPeriod === 0) {
+      message = 'Your period is predicted to start today! 🩸';
+      type = 'period_start';
+    } else if (prediction.daysUntilPeriod === 1) {
+      message = 'Your period is predicted to start tomorrow. Get ready! 🩸';
+      type = 'period_tomorrow';
+    } else if (prediction.daysUntilPeriod <= 3) {
+      message = `Your period is predicted in ${prediction.daysUntilPeriod} days. Time to prepare! 🩸`;
+      type = 'period_soon';
+    } else if (prediction.daysUntilOvulation === 0) {
+      message = 'You\'re likely ovulating today! Peak fertility window 🌟';
+      type = 'ovulation_today';
+    } else if (prediction.daysUntilOvulation <= 2) {
+      message = `Ovulation predicted in ${prediction.daysUntilOvulation} days. Fertile window approaching! 🌟`;
+      type = 'ovulation_soon';
+    } else {
+      message = `You're in your ${prediction.cyclePhase.phase} phase. ${prediction.cyclePhase.description}`;
+      type = 'cycle_phase';
+    }
+    
+    return {
+      message,
+      type,
+      prediction,
+      cyclePhase: prediction.cyclePhase,
+      confidence: prediction.confidence
+    };
+  } catch (error) {
+    console.error('Error getting daily prediction:', error);
+    throw error;
+  }
+};
+
 // Clear all data (for testing)
 export const clearAllData = async (): Promise<void> => {
   try {
@@ -601,7 +910,8 @@ export const clearAllData = async (): Promise<void> => {
       'userCycles',
       'organHealth',
       'userSymptoms',
-      'diseaseHistory'
+      'diseaseHistory',
+      'userPeriods'
     ]);
     console.log('All data cleared');
   } catch (error) {
