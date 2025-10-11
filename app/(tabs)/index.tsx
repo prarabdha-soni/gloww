@@ -191,13 +191,15 @@ export default function HomeScreen() {
       );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <Text style={styles.logo}>Gloww</Text>
-        <Text style={styles.tagline}>Where reproductive balance begins — naturally, scientifically, beautifully.</Text>
-      </View>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+          {isNewUser && (
+            <View style={styles.header}>
+              <Text style={styles.logo}>Gloww</Text>
+              <Text style={styles.tagline}>Where reproductive balance begins — naturally, scientifically, beautifully.</Text>
+            </View>
+          )}
 
-      <View style={styles.content}>
+          <View style={styles.content}>
         {isNewUser ? (
           renderNewUserWelcome()
         ) : (
