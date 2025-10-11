@@ -6,7 +6,7 @@ import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain
 import GlowwScore from '@/components/GlowwScore';
 import OrganDashboard from '@/components/OrganDashboard';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
-import { getUserById, getUserOrganHealth } from '@/services/database';
+import { getUserById, getUserOrganHealth } from '@/services/database-rn';
 
 export default function HomeScreen() {
   const router = useRouter();

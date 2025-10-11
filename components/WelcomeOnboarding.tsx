@@ -14,7 +14,7 @@ import {
 } from 'lucide-react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
-import { saveUserData, calculateGlowwScore, saveOrganHealth } from '@/services/database';
+import { saveUserData, calculateGlowwScore, saveOrganHealth } from '@/services/database-rn';
 
 interface OnboardingQuestion {
   id: string;
