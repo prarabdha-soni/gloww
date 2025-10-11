@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.nude.background,
   },
   header: {
-    paddingTop: spacing.xxl + spacing.md,
+    paddingTop: spacing.lg,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
   },
@@ -343,6 +343,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl + 80, // Add space for tab bar
   },
   title: {
     fontFamily: typography.fontFamily.semibold,

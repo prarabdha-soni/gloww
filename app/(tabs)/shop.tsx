@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: spacing.xxl + spacing.md,
+    paddingTop: spacing.lg,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
   },
@@ -196,8 +196,8 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl + 80, // Add space for tab bar
   },
   sectionTitle: {
     fontFamily: typography.fontFamily.semibold,

@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: spacing.xxl + spacing.md,
+    paddingTop: spacing.lg,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
   },
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   },
   quickInsights: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.xl + 80, // Add space for tab bar
   },
   insightsTitle: {
     fontFamily: typography.fontFamily.semibold,

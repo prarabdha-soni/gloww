@@ -14,22 +14,21 @@ export default function TabLayout() {
           height: 80,
           paddingBottom: 20,
           paddingTop: 12,
-          width: '100%',
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
+          margin: 0,
+          paddingHorizontal: 0,
         },
         tabBarActiveTintColor: colors.nude.roseGold,
         tabBarInactiveTintColor: colors.nude.textSecondary,
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontFamily: 'Inter-Medium',
+          fontSize: 12,
+          fontFamily: 'Inter-SemiBold',
+          fontWeight: '600',
         },
         tabBarItemStyle: {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
+          paddingVertical: 4,
         },
       }}>
       <Tabs.Screen
