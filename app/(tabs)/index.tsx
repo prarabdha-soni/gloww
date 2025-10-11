@@ -25,11 +25,28 @@ export default function HomeScreen() {
     loadUserData();
   }, []);
 
+  // Add focus listener to reload data when returning from onboarding
+  useEffect(() => {
+    const handleFocus = () => {
+      loadUserData();
+    };
+
+    // Listen for focus events (when user returns to this screen)
+    const unsubscribe = () => {
+      // This will be called when the screen comes into focus
+      loadUserData();
+    };
+
+    return unsubscribe;
+  }, []);
+
   const loadUserData = async () => {
     try {
       const isOnboardingComplete = await AsyncStorage.getItem('isOnboardingComplete');
       const userId = await AsyncStorage.getItem('userId');
       const localUserData = await AsyncStorage.getItem('userData');
+
+      console.log('Loading user data:', { isOnboardingComplete, userId, localUserData });
 
       if (isOnboardingComplete === 'true' && userId && localUserData) {
         setIsNewUser(false);
@@ -37,6 +54,8 @@ export default function HomeScreen() {
         setUserData(parsedUserData);
         setUserName(parsedUserData.name || 'Beautiful');
         setUserGlowwScore(parsedUserData.glowwScore || 0);
+
+        console.log('User data loaded:', parsedUserData);
 
         // Load organ health from database
         try {
@@ -48,14 +67,19 @@ export default function HomeScreen() {
               { name: 'Thyroid', status: organHealth.thyroid.status as any, progress: organHealth.thyroid.progress, color: colors.reproductive.thyroid },
               { name: 'Stress', status: organHealth.stress.status as any, progress: organHealth.stress.progress, color: colors.reproductive.stress },
             ]);
+            console.log('Organ health loaded:', organHealth);
           }
         } catch (error) {
           console.error('Error loading organ health from database:', error);
           // Use default organ data if database fails
         }
+      } else {
+        console.log('Onboarding not complete, showing new user welcome');
+        setIsNewUser(true);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
+      setIsNewUser(true);
     }
   };
 
@@ -81,6 +105,22 @@ export default function HomeScreen() {
 
   const handleStartOnboarding = () => {
     router.push('/welcome');
+  };
+
+  const handleClearData = async () => {
+    try {
+      await AsyncStorage.removeItem('isOnboardingComplete');
+      await AsyncStorage.removeItem('userId');
+      await AsyncStorage.removeItem('userData');
+      await AsyncStorage.removeItem('organHealth');
+      setIsNewUser(true);
+      setUserData(null);
+      setUserName('');
+      setUserGlowwScore(0);
+      console.log('Data cleared, showing new user welcome');
+    } catch (error) {
+      console.error('Error clearing data:', error);
+    }
   };
 
   const renderNewUserWelcome = () => (
@@ -135,12 +175,20 @@ export default function HomeScreen() {
           <ArrowRight size={20} color={colors.nude.background} />
         </TouchableOpacity>
         
-        <Text style={styles.privacyText}>
-          🔒 Your data is private and secure. We never share your personal information.
-        </Text>
-      </View>
-    </View>
-  );
+            <Text style={styles.privacyText}>
+              🔒 Your data is private and secure. We never share your personal information.
+            </Text>
+            
+            {/* Debug button - remove in production */}
+            <TouchableOpacity 
+              style={styles.debugButton}
+              onPress={handleClearData}
+            >
+              <Text style={styles.debugButtonText}>Clear Data (Debug)</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -158,13 +206,21 @@ export default function HomeScreen() {
               Welcome back, {userName}! 💕{'\n'}Your Reproductive Wellness
             </Text>
 
-            <GlowwScore 
-              score={overallScore} 
-              status={getScoreStatus(overallScore)} 
-              description={getScoreDescription(overallScore)}
-            />
+                <GlowwScore
+                  score={overallScore}
+                  status={getScoreStatus(overallScore)}
+                  description={getScoreDescription(overallScore)}
+                />
 
-            <OrganDashboard organs={organs} onOrganPress={handleOrganPress} />
+                <OrganDashboard organs={organs} onOrganPress={handleOrganPress} />
+                
+                {/* Debug button - remove in production */}
+                <TouchableOpacity 
+                  style={styles.debugButton}
+                  onPress={handleClearData}
+                >
+                  <Text style={styles.debugButtonText}>Clear Data (Debug)</Text>
+                </TouchableOpacity>
           </>
         )}
 
@@ -717,12 +773,25 @@ const styles = StyleSheet.create({
     color: colors.nude.text,
     flex: 1,
   },
-  privacyText: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.size.sm,
-    color: colors.nude.textSecondary,
-    textAlign: 'center',
-    marginTop: spacing.md,
-    lineHeight: 18,
-  },
-});
+      privacyText: {
+        fontFamily: typography.fontFamily.regular,
+        fontSize: typography.size.sm,
+        color: colors.nude.textSecondary,
+        textAlign: 'center',
+        marginTop: spacing.md,
+        lineHeight: 18,
+      },
+      debugButton: {
+        backgroundColor: colors.semantic.error,
+        borderRadius: borderRadius.md,
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.md,
+        marginTop: spacing.md,
+      },
+      debugButtonText: {
+        fontFamily: typography.fontFamily.medium,
+        fontSize: typography.size.sm,
+        color: colors.nude.background,
+        textAlign: 'center',
+      },
+    });
