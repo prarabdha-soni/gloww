@@ -1,39 +1,66 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower, Settings } from 'lucide-react-native';
 import GlowwScore from '@/components/GlowwScore';
 import OrganDashboard from '@/components/OrganDashboard';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
+import { getUserById, getUserOrganHealth } from '@/services/database';
 
 export default function HomeScreen() {
   const router = useRouter();
   const [isNewUser, setIsNewUser] = useState(true);
   const [userName, setUserName] = useState('');
   const [userData, setUserData] = useState<any>(null);
-
-  useEffect(() => {
-    // Check if user has completed onboarding
-    // In a real app, this would check local storage or API
-    const hasCompletedOnboarding = false; // This would come from storage
-    setIsNewUser(!hasCompletedOnboarding);
-    
-    if (hasCompletedOnboarding) {
-      // Load user data from storage
-      setUserName('Beautiful'); // Default name
-    }
-  }, []);
-
-  // Calculate dynamic Gloww Score based on organ health
-  const organs = [
+  const [userGlowwScore, setUserGlowwScore] = useState(0);
+  const [organs, setOrgans] = useState([
     { name: 'Uterus', status: 'healing' as const, progress: 30, color: colors.reproductive.uterus },
     { name: 'Ovaries', status: 'balanced' as const, progress: 75, color: colors.reproductive.ovaries },
     { name: 'Thyroid', status: 'rising' as const, progress: 60, color: colors.reproductive.thyroid },
     { name: 'Stress', status: 'rising' as const, progress: 45, color: colors.reproductive.stress },
-  ];
+  ]);
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const isOnboardingComplete = await AsyncStorage.getItem('isOnboardingComplete');
+      const userId = await AsyncStorage.getItem('userId');
+      const localUserData = await AsyncStorage.getItem('userData');
+
+      if (isOnboardingComplete === 'true' && userId && localUserData) {
+        setIsNewUser(false);
+        const parsedUserData = JSON.parse(localUserData);
+        setUserData(parsedUserData);
+        setUserName(parsedUserData.name || 'Beautiful');
+        setUserGlowwScore(parsedUserData.glowwScore || 0);
+
+        // Load organ health from database
+        try {
+          const organHealth = await getUserOrganHealth(userId);
+          if (organHealth) {
+            setOrgans([
+              { name: 'Uterus', status: organHealth.uterus.status as any, progress: organHealth.uterus.progress, color: colors.reproductive.uterus },
+              { name: 'Ovaries', status: organHealth.ovaries.status as any, progress: organHealth.ovaries.progress, color: colors.reproductive.ovaries },
+              { name: 'Thyroid', status: organHealth.thyroid.status as any, progress: organHealth.thyroid.progress, color: colors.reproductive.thyroid },
+              { name: 'Stress', status: organHealth.stress.status as any, progress: organHealth.stress.progress, color: colors.reproductive.stress },
+            ]);
+          }
+        } catch (error) {
+          console.error('Error loading organ health from database:', error);
+          // Use default organ data if database fails
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
 
   // Calculate overall Gloww Score
-  const overallScore = Math.round(organs.reduce((sum, organ) => sum + organ.progress, 0) / organs.length);
+  const overallScore = userGlowwScore || Math.round(organs.reduce((sum, organ) => sum + organ.progress, 0) / organs.length);
   const getScoreStatus = (score: number) => {
     if (score >= 80) return "Excellent reproductive health! 🌟";
     if (score >= 60) return "Good progress, keep nurturing yourself 💕";

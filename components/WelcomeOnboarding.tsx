@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { 
   Heart, 
   Calendar, 
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
+import { saveUserData, calculateGlowwScore, saveOrganHealth } from '@/services/database';
 
 interface OnboardingQuestion {
   id: string;
@@ -108,14 +109,59 @@ export default function WelcomeOnboarding({ onComplete }: WelcomeOnboardingProps
     }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       setIsComplete(true);
       // Calculate Gloww Score based on answers
       const score = calculateGlowwScore(answers);
-      onComplete({ ...answers, glowwScore: score });
+      
+      try {
+        // Save user data to MongoDB
+        const userId = await saveUserData({
+          name: answers.name || 'Beautiful',
+          age: answers.age || '26-35',
+          cycleLength: answers.cycle_length || '25-28 days',
+          goals: answers.goals || [],
+          symptoms: answers.symptoms || [],
+          lifestyle: answers.lifestyle || 'Moderately active',
+          glowwScore: score,
+          isOnboardingComplete: true,
+        });
+
+        // Save initial organ health based on score
+        const organHealth = {
+          userId,
+          uterus: { 
+            status: score >= 70 ? 'balanced' : score >= 50 ? 'healing' : 'rising', 
+            progress: Math.max(30, score - 20) 
+          },
+          ovaries: { 
+            status: score >= 80 ? 'balanced' : score >= 60 ? 'healing' : 'rising', 
+            progress: Math.max(40, score - 10) 
+          },
+          thyroid: { 
+            status: score >= 75 ? 'balanced' : score >= 55 ? 'healing' : 'rising', 
+            progress: Math.max(35, score - 15) 
+          },
+          stress: { 
+            status: score >= 60 ? 'balanced' : score >= 40 ? 'healing' : 'rising', 
+            progress: Math.max(25, score - 25) 
+          },
+        };
+
+        await saveOrganHealth(organHealth);
+
+        onComplete({ ...answers, glowwScore: score, userId });
+      } catch (error) {
+        console.error('Error saving user data:', error);
+        Alert.alert(
+          'Error',
+          'Failed to save your data. Please try again.',
+          [{ text: 'OK' }]
+        );
+      }
     }
   };
 
