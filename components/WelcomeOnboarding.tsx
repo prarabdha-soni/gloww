@@ -9,7 +9,8 @@ import {
   Sparkles, 
   ChevronRight,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Brain
 } from 'lucide-react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
@@ -43,21 +44,21 @@ export default function WelcomeOnboarding({ onComplete }: WelcomeOnboardingProps
     },
     {
       id: 'age',
-      question: "How old are you?",
+      question: "What's your age range?",
       type: 'single',
       options: ['18-25', '26-35', '36-45', '46-55', '55+'],
       icon: <Calendar size={24} color={colors.reproductive.ovaries} />
     },
     {
       id: 'cycle_length',
-      question: "What's your typical cycle length?",
+      question: "How long is your typical menstrual cycle?",
       type: 'single',
       options: ['21-24 days', '25-28 days', '29-32 days', '33+ days', 'Irregular'],
       icon: <Target size={24} color={colors.reproductive.uterus} />
     },
     {
       id: 'goals',
-      question: "What are your main wellness goals?",
+      question: "What are your main wellness goals? (Select all that apply)",
       type: 'multiple',
       options: [
         'Track my period',
@@ -73,7 +74,7 @@ export default function WelcomeOnboarding({ onComplete }: WelcomeOnboardingProps
     },
     {
       id: 'symptoms',
-      question: "Do you experience any of these?",
+      question: "Do you experience any of these symptoms? (Select all that apply)",
       type: 'multiple',
       options: [
         'Irregular periods',
@@ -90,7 +91,7 @@ export default function WelcomeOnboarding({ onComplete }: WelcomeOnboardingProps
     },
     {
       id: 'lifestyle',
-      question: "How would you describe your lifestyle?",
+      question: "How would you describe your activity level?",
       type: 'single',
       options: [
         'Very active (exercise 5+ times/week)',
@@ -298,22 +299,57 @@ export default function WelcomeOnboarding({ onComplete }: WelcomeOnboardingProps
   const renderWelcome = () => (
     <View style={styles.welcomeContainer}>
       <View style={styles.welcomeIcon}>
-        <Sparkles size={48} color={colors.nude.roseGold} />
+        <Sparkles size={56} color={colors.nude.roseGold} />
       </View>
       <Text style={styles.welcomeTitle}>Welcome to Gloww! 🌸</Text>
       <Text style={styles.welcomeSubtitle}>
-        Let's get to know you better so we can create your personalized wellness journey
+        Your personal reproductive health companion
       </Text>
       <Text style={styles.welcomeDescription}>
-        This will only take 2 minutes and help us give you the most accurate health insights
+        We'll ask you a few simple questions to create your personalized wellness plan. This takes just 2 minutes and helps us give you the most accurate health insights.
       </Text>
+      
+      <View style={styles.welcomeBenefits}>
+        <Text style={styles.welcomeBenefitsTitle}>✨ What you'll get:</Text>
+        <View style={styles.welcomeBenefitsList}>
+          <View style={styles.welcomeBenefitItem}>
+            <View style={styles.welcomeBenefitIcon}>
+              <Heart size={16} color={colors.nude.background} />
+            </View>
+            <Text style={styles.welcomeBenefitText}>Your personal Gloww Score</Text>
+          </View>
+          <View style={styles.welcomeBenefitItem}>
+            <View style={styles.welcomeBenefitIcon}>
+              <Calendar size={16} color={colors.nude.background} />
+            </View>
+            <Text style={styles.welcomeBenefitText}>Smart cycle tracking</Text>
+          </View>
+          <View style={styles.welcomeBenefitItem}>
+            <View style={styles.welcomeBenefitIcon}>
+              <Target size={16} color={colors.nude.background} />
+            </View>
+            <Text style={styles.welcomeBenefitText}>Fertility predictions</Text>
+          </View>
+          <View style={styles.welcomeBenefitItem}>
+            <View style={styles.welcomeBenefitIcon}>
+              <Brain size={16} color={colors.nude.background} />
+            </View>
+            <Text style={styles.welcomeBenefitText}>Health insights & tips</Text>
+          </View>
+        </View>
+      </View>
+      
       <TouchableOpacity 
         style={styles.startButton}
         onPress={() => setCurrentStep(0)}
       >
-        <Text style={styles.startButtonText}>Let's Begin 💕</Text>
+        <Text style={styles.startButtonText}>Start Your Journey 💕</Text>
         <ArrowRight size={20} color={colors.nude.background} />
       </TouchableOpacity>
+      
+      <Text style={styles.privacyNote}>
+        🔒 Your data is private and secure. We never share your personal information.
+      </Text>
     </View>
   );
 
@@ -323,7 +359,7 @@ export default function WelcomeOnboarding({ onComplete }: WelcomeOnboardingProps
     return (
       <View style={styles.completionContainer}>
         <View style={styles.completionIcon}>
-          <Heart size={48} color={colors.nude.roseGold} />
+          <Heart size={56} color={colors.semantic.balanced} />
         </View>
         <Text style={styles.completionTitle}>All Done! 🎉</Text>
         <Text style={styles.completionSubtitle}>
@@ -332,32 +368,32 @@ export default function WelcomeOnboarding({ onComplete }: WelcomeOnboardingProps
         
         <View style={styles.scoreContainer}>
           <View style={styles.scoreCircle}>
-            <Svg width={120} height={120}>
+            <Svg width={140} height={140}>
               <Circle
-                cx="60"
-                cy="60"
-                r="50"
+                cx="70"
+                cy="70"
+                r="60"
                 stroke={colors.nude.border}
                 strokeWidth="8"
                 fill="none"
               />
               <Circle
-                cx="60"
-                cy="60"
-                r="50"
+                cx="70"
+                cy="70"
+                r="60"
                 stroke={colors.nude.roseGold}
                 strokeWidth="8"
                 fill="none"
-                strokeDasharray={`${2 * Math.PI * 50 * (score / 100)} ${2 * Math.PI * 50}`}
-                strokeDashoffset={2 * Math.PI * 50 * 0.25}
+                strokeDasharray={`${2 * Math.PI * 60 * (score / 100)} ${2 * Math.PI * 60}`}
+                strokeDashoffset={2 * Math.PI * 60 * 0.25}
                 strokeLinecap="round"
-                transform="rotate(-90 60 60)"
+                transform="rotate(-90 70 70)"
               />
               <Text
-                x="60"
-                y="60"
+                x="70"
+                y="70"
                 textAnchor="middle"
-                fontSize="24"
+                fontSize="28"
                 fontFamily={typography.fontFamily.semibold}
                 fill={colors.nude.text}
               >
@@ -372,6 +408,30 @@ export default function WelcomeOnboarding({ onComplete }: WelcomeOnboardingProps
              score >= 40 ? "Healing journey in progress 🌱" :
              "Let's start your wellness journey together 🌸"}
           </Text>
+        </View>
+
+        <View style={styles.nextStepsContainer}>
+          <Text style={styles.nextStepsTitle}>What's next?</Text>
+          <View style={styles.nextStepsList}>
+            <View style={styles.nextStepItem}>
+              <View style={styles.nextStepIcon}>
+                <Calendar size={16} color={colors.nude.background} />
+              </View>
+              <Text style={styles.nextStepText}>Track your cycle and symptoms</Text>
+            </View>
+            <View style={styles.nextStepItem}>
+              <View style={styles.nextStepIcon}>
+                <Target size={16} color={colors.nude.background} />
+              </View>
+              <Text style={styles.nextStepText}>Get fertility predictions</Text>
+            </View>
+            <View style={styles.nextStepItem}>
+              <View style={styles.nextStepIcon}>
+                <Brain size={16} color={colors.nude.background} />
+              </View>
+              <Text style={styles.nextStepText}>Receive personalized insights</Text>
+            </View>
+          </View>
         </View>
 
         <TouchableOpacity 
@@ -678,5 +738,87 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.semibold,
     fontSize: typography.size.lg,
     color: colors.nude.background,
+  },
+  welcomeBenefits: {
+    backgroundColor: colors.nude.peach,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginVertical: spacing.lg,
+    width: '100%',
+  },
+  welcomeBenefitsTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  welcomeBenefitsList: {
+    gap: spacing.sm,
+  },
+  welcomeBenefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.xs,
+  },
+  welcomeBenefitIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.nude.roseGold,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  welcomeBenefitText: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    flex: 1,
+  },
+  privacyNote: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    textAlign: 'center',
+    marginTop: spacing.md,
+    lineHeight: 18,
+  },
+  nextStepsContainer: {
+    backgroundColor: colors.nude.peach,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginVertical: spacing.lg,
+    width: '100%',
+  },
+  nextStepsTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  nextStepsList: {
+    gap: spacing.sm,
+  },
+  nextStepItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.xs,
+  },
+  nextStepIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.nude.roseGold,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  nextStepText: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    flex: 1,
   },
 });

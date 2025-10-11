@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower, Settings } from 'lucide-react-native';
+import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower, Settings, ArrowRight } from 'lucide-react-native';
 import GlowwScore from '@/components/GlowwScore';
 import OrganDashboard from '@/components/OrganDashboard';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
@@ -87,45 +87,57 @@ export default function HomeScreen() {
     <View style={styles.newUserContainer}>
       <View style={styles.welcomeCard}>
         <View style={styles.welcomeIcon}>
-          <Sparkles size={32} color={colors.nude.roseGold} />
+          <Sparkles size={40} color={colors.nude.roseGold} />
         </View>
         <Text style={styles.welcomeTitle}>Welcome to Gloww! 🌸</Text>
         <Text style={styles.welcomeSubtitle}>
-          Your personalized reproductive wellness journey starts here
+          Your personal reproductive health companion
         </Text>
         <Text style={styles.welcomeDescription}>
-          Let's get to know you better so we can create the perfect wellness plan just for you
+          We'll ask you a few simple questions to create your personalized wellness plan. This takes just 2 minutes and helps us give you the most accurate health insights.
         </Text>
+        
+        <View style={styles.benefitsContainer}>
+          <Text style={styles.benefitsTitle}>✨ What you'll get:</Text>
+          <View style={styles.benefitsList}>
+            <View style={styles.benefitItem}>
+              <View style={styles.benefitIcon}>
+                <Heart size={16} color={colors.nude.background} />
+              </View>
+              <Text style={styles.benefitText}>Your personal Gloww Score</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <View style={styles.benefitIcon}>
+                <Calendar size={16} color={colors.nude.background} />
+              </View>
+              <Text style={styles.benefitText}>Smart period & cycle tracking</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <View style={styles.benefitIcon}>
+                <Target size={16} color={colors.nude.background} />
+              </View>
+              <Text style={styles.benefitText}>Fertility window predictions</Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <View style={styles.benefitIcon}>
+                <Brain size={16} color={colors.nude.background} />
+              </View>
+              <Text style={styles.benefitText}>Personalized health insights</Text>
+            </View>
+          </View>
+        </View>
         
         <TouchableOpacity 
           style={styles.startOnboardingButton}
           onPress={handleStartOnboarding}
         >
-          <Text style={styles.startOnboardingText}>Get Started</Text>
-          <Sparkles size={20} color={colors.nude.background} />
+          <Text style={styles.startOnboardingText}>Start Your Journey</Text>
+          <ArrowRight size={20} color={colors.nude.background} />
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.featuresPreview}>
-        <Text style={styles.featuresTitle}>What you'll get:</Text>
-        <View style={styles.featureList}>
-          <View style={styles.featureItem}>
-            <Heart size={20} color={colors.reproductive.uterus} />
-            <Text style={styles.featureText}>Personalized Gloww Score</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Calendar size={20} color={colors.reproductive.ovaries} />
-            <Text style={styles.featureText}>Smart cycle tracking</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Target size={20} color={colors.reproductive.thyroid} />
-            <Text style={styles.featureText}>Fertility predictions</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Brain size={20} color={colors.reproductive.stress} />
-            <Text style={styles.featureText}>Health insights & tips</Text>
-          </View>
-        </View>
+        
+        <Text style={styles.privacyText}>
+          🔒 Your data is private and secure. We never share your personal information.
+        </Text>
       </View>
     </View>
   );
@@ -684,5 +696,50 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
     color: colors.nude.text,
     marginLeft: spacing.sm,
+  },
+  benefitsContainer: {
+    backgroundColor: colors.nude.peach,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginVertical: spacing.lg,
+    width: '100%',
+  },
+  benefitsTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  benefitsList: {
+    gap: spacing.sm,
+  },
+  benefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.xs,
+  },
+  benefitIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.nude.roseGold,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  benefitText: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    flex: 1,
+  },
+  privacyText: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    textAlign: 'center',
+    marginTop: spacing.md,
+    lineHeight: 18,
   },
 });
