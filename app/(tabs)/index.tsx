@@ -104,10 +104,6 @@ export default function HomeScreen() {
     return "Start with gentle self-care practices. Your body is ready to heal.";
   };
 
-  const handleOrganPress = (organ: any) => {
-    // Navigate to organ details
-    console.log('Organ pressed:', organ.name);
-  };
 
   const handleStartOnboarding = () => {
     router.push('/welcome');
