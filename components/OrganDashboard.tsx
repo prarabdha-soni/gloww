@@ -11,10 +11,11 @@ interface OrganData {
 
 interface OrganDashboardProps {
   organs: OrganData[];
-  onOrganPress: (organ: OrganData) => void;
+  onOrganPress: (organName: string) => void;
+  onDashboardPress?: () => void;
 }
 
-export default function OrganDashboard({ organs, onOrganPress }: OrganDashboardProps) {
+export default function OrganDashboard({ organs, onOrganPress, onDashboardPress }: OrganDashboardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healing': return colors.semantic.healing;
@@ -37,13 +38,20 @@ export default function OrganDashboard({ organs, onOrganPress }: OrganDashboardP
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Organ Dashboard</Text>
+      <TouchableOpacity 
+        style={styles.titleContainer}
+        onPress={onDashboardPress}
+        disabled={!onDashboardPress}
+      >
+        <Text style={styles.title}>Organ Dashboard</Text>
+        {onDashboardPress && <Text style={styles.tapHint}>Tap to view details</Text>}
+      </TouchableOpacity>
       <View style={styles.organsGrid}>
         {organs.map((organ, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.organCard, { backgroundColor: organ.color }]}
-            onPress={() => onOrganPress(organ)}
+            onPress={() => onOrganPress(organ.name)}
           >
             <View style={styles.organHeader}>
               <Text style={styles.organName}>{organ.name}</Text>
@@ -76,11 +84,19 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: spacing.xl,
   },
+  titleContainer: {
+    marginBottom: spacing.md,
+  },
   title: {
     fontFamily: typography.fontFamily.semibold,
     fontSize: typography.size.xl,
     color: colors.nude.text,
-    marginBottom: spacing.md,
+  },
+  tapHint: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    marginTop: spacing.xs,
   },
   organsGrid: {
     gap: spacing.sm,

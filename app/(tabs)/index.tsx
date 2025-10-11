@@ -8,6 +8,8 @@ import OrganDashboard from '@/components/OrganDashboard';
 import DailyGlowwCard from '@/components/DailyGlowwCard';
 import OrganStoryline from '@/components/OrganStoryline';
 import MicroChallenges from '@/components/MicroChallenges';
+import OrganHealingScreen from '@/components/OrganHealingScreen';
+import OrganHealthOverview from '@/components/OrganHealthOverview';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 import { getUserById, getUserOrganHealth } from '@/services/database-rn';
 
@@ -23,9 +25,10 @@ export default function HomeScreen() {
     { name: 'Thyroid', status: 'rising' as const, progress: 60, color: colors.reproductive.thyroid },
     { name: 'Stress', status: 'rising' as const, progress: 45, color: colors.reproductive.stress },
   ]);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'daily' | 'storyline' | 'challenges'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'daily' | 'challenges'>('dashboard');
   const [cyclePhase, setCyclePhase] = useState<'menstrual' | 'follicular' | 'ovulation' | 'luteal'>('follicular');
   const [totalPoints, setTotalPoints] = useState(0);
+  const [selectedOrgan, setSelectedOrgan] = useState<string | null>(null);
 
   useEffect(() => {
     loadUserData();
@@ -100,7 +103,7 @@ export default function HomeScreen() {
   const getScoreDescription = (score: number) => {
     if (score >= 80) return "Your reproductive system is thriving. Maintain your healthy habits!";
     if (score >= 60) return "You're doing great! Small improvements will boost your score even more.";
-    if (score >= 40) return "Your body is healing beautifully. Every small step counts.";
+    if (score >= 40) return "Your ovaries are asking for rest today 🌸 — take a short walk and hydrate more.";
     return "Start with gentle self-care practices. Your body is ready to heal.";
   };
 
@@ -143,7 +146,16 @@ export default function HomeScreen() {
 
   const handleOrganPress = (organ: string) => {
     console.log('Organ pressed:', organ);
-    // Navigate to organ details or show organ-specific content
+    setSelectedOrgan(organ);
+  };
+
+  const handleOrganDashboardPress = () => {
+    // Show organ health overview instead of individual organ
+    setSelectedOrgan('dashboard');
+  };
+
+  const handleBackFromOrgan = () => {
+    setSelectedOrgan(null);
   };
 
   const renderNewUserWelcome = () => (
@@ -213,6 +225,49 @@ export default function HomeScreen() {
         </View>
       );
 
+  // Show organ health overview or individual organ screen
+  if (selectedOrgan) {
+    if (selectedOrgan === 'dashboard') {
+      return (
+        <OrganHealthOverview
+          organHealth={{
+            uterus: { status: organs[0].status, progress: organs[0].progress },
+            ovaries: { status: organs[1].status, progress: organs[1].progress },
+            thyroid: { status: organs[2].status, progress: organs[2].progress },
+            stress: { status: organs[3].status, progress: organs[3].progress },
+          }}
+          onBack={handleBackFromOrgan}
+          onOrganPress={handleOrganPress}
+        />
+      );
+    } else {
+      const organ = organs.find(o => o.name === selectedOrgan);
+      console.log('Selected organ:', selectedOrgan);
+      console.log('Found organ:', organ);
+      if (organ) {
+        return (
+          <OrganHealingScreen
+            organName={organ.name}
+            organStatus={organ.status}
+            organProgress={organ.progress}
+            organColor={organ.color}
+            onBack={handleBackFromOrgan}
+          />
+        );
+      } else {
+        console.log('Organ not found for:', selectedOrgan);
+        return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.nude.background }}>
+            <Text>Organ not found: {selectedOrgan}</Text>
+            <TouchableOpacity onPress={handleBackFromOrgan} style={{ marginTop: 20, padding: 10, backgroundColor: colors.nude.roseGold, borderRadius: 8 }}>
+              <Text>Back</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      }
+    }
+  }
+
   return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
           {isNewUser && (
@@ -227,9 +282,6 @@ export default function HomeScreen() {
           renderNewUserWelcome()
         ) : (
           <>
-            <Text style={styles.title}>
-              Welcome back, {userName}! 💕{'\n'}Your Reproductive Wellness
-            </Text>
 
             {/* Navigation Tabs */}
             <View style={styles.navigationTabs}>
@@ -253,15 +305,6 @@ export default function HomeScreen() {
                 </Text>
               </TouchableOpacity>
               
-              <TouchableOpacity
-                style={[styles.navTab, currentView === 'storyline' && styles.activeNavTab]}
-                onPress={() => setCurrentView('storyline')}
-              >
-                <Flower size={20} color={currentView === 'storyline' ? colors.nude.background : colors.nude.text} />
-                <Text style={[styles.navTabText, currentView === 'storyline' && styles.activeNavTabText]}>
-                  Healing Journey
-                </Text>
-              </TouchableOpacity>
               
               <TouchableOpacity
                 style={[styles.navTab, currentView === 'challenges' && styles.activeNavTab]}
@@ -283,7 +326,11 @@ export default function HomeScreen() {
                   description={getScoreDescription(overallScore)}
                 />
 
-                <OrganDashboard organs={organs} onOrganPress={handleOrganPress} />
+                <OrganDashboard 
+                  organs={organs} 
+                  onOrganPress={handleOrganPress}
+                  onDashboardPress={handleOrganDashboardPress}
+                />
               </>
             )}
 
@@ -298,17 +345,6 @@ export default function HomeScreen() {
               />
             )}
 
-            {currentView === 'storyline' && (
-              <OrganStoryline
-                organHealth={{
-                  uterus: { status: organs[0].status, progress: organs[0].progress },
-                  ovaries: { status: organs[1].status, progress: organs[1].progress },
-                  thyroid: { status: organs[2].status, progress: organs[2].progress },
-                  stress: { status: organs[3].status, progress: organs[3].progress },
-                }}
-                onOrganPress={handleOrganPress}
-              />
-            )}
 
             {currentView === 'challenges' && (
               <MicroChallenges
@@ -322,160 +358,13 @@ export default function HomeScreen() {
               />
             )}
                 
-                {/* Debug button - remove in production */}
-                <TouchableOpacity 
-                  style={styles.debugButton}
-                  onPress={handleClearData}
-                >
-                  <Text style={styles.debugButtonText}>Clear Data (Debug)</Text>
-                </TouchableOpacity>
           </>
         )}
 
-        <View style={styles.tipCard}>
-          <View style={styles.tipIconContainer}>
-            <Lightbulb size={20} color={colors.nude.roseGold} />
-          </View>
-          <View style={styles.tipContent}>
-            <Text style={styles.tipTitle}>Reproductive Wellness Tip</Text>
-            <Text style={styles.tipText}>
-              Your uterus is healing—gentle movement and stress reduction will support the process.
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.quickActions}>
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => router.push('/track')}
-          >
-            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.ovaries }]}>
-              <Calendar size={24} color={colors.nude.background} />
-            </View>
-            <Text style={styles.actionLabel}>My Cycle</Text>
-          </TouchableOpacity>
 
 
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => router.push('/test')}
-          >
-            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.thyroid }]}>
-              <Beaker size={24} color={colors.nude.background} />
-            </View>
-            <Text style={styles.actionLabel}>Health Tests</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => router.push('/shop')}
-          >
-            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.stress }]}>
-              <Flower size={24} color={colors.nude.background} />
-            </View>
-            <Text style={styles.actionLabel}>Wellness</Text>
-          </TouchableOpacity>
-        </View>
 
-        <Text style={styles.sectionTitle}>Your Wellness Journey 💕</Text>
-
-        <View style={styles.modesGrid}>
-
-          <TouchableOpacity
-            style={[styles.modeCard, { backgroundColor: colors.reproductive.ovaries }]}
-            onPress={() => router.push('/modes/cycle')}
-          >
-            <Calendar size={28} color={colors.nude.background} />
-            <Text style={styles.modeLabel}>Period & Cycle</Text>
-            <Text style={styles.modeScore}>{organs.find(o => o.name === 'Ovaries')?.progress || 0}</Text>
-            <Text style={styles.modeSubtext}>Monitor your cycle</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.modeCard, { backgroundColor: colors.reproductive.thyroid }]}
-            onPress={() => router.push('/modes/hormones')}
-          >
-            <Brain size={28} color={colors.nude.background} />
-            <Text style={styles.modeLabel}>Hormone Balance</Text>
-            <Text style={styles.modeScore}>{organs.find(o => o.name === 'Thyroid')?.progress || 0}</Text>
-            <Text style={styles.modeSubtext}>Balance your hormones</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.modeCard, { backgroundColor: colors.reproductive.stress }]}
-            onPress={() => router.push('/modes/stress')}
-          >
-            <Flower size={28} color={colors.nude.background} />
-            <Text style={styles.modeLabel}>Self-Care & Stress</Text>
-            <Text style={styles.modeScore}>{organs.find(o => o.name === 'Stress')?.progress || 0}</Text>
-            <Text style={styles.modeSubtext}>Nurture your wellbeing</Text>
-          </TouchableOpacity>
-        </View>
-
-            <TouchableOpacity
-              style={styles.expertCallCard}
-              onPress={() => router.push('/doctors')}
-            >
-              <View style={styles.expertCallIcon}>
-                <Phone size={24} color={colors.nude.background} />
-              </View>
-              <View style={styles.expertCallContent}>
-                <Text style={styles.expertCallTitle}>💬 Chat with a Women's Health Expert</Text>
-                <Text style={styles.expertCallSubtitle}>
-                  Get personalized advice from certified reproductive health specialists
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.pregnancyCard}
-              onPress={() => router.push('/track')}
-            >
-              <View style={styles.pregnancyIcon}>
-                <Baby size={24} color={colors.nude.background} />
-              </View>
-              <View style={styles.pregnancyContent}>
-                <Text style={styles.pregnancyTitle}>🤱 Pregnancy & Baby Tracking</Text>
-                <Text style={styles.pregnancySubtitle}>
-                  Track your pregnancy journey and baby's growth week by week
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            {/* New Feature Cards */}
-            <View style={styles.newFeaturesSection}>
-              <Text style={styles.sectionTitle}>Advanced Features</Text>
-              
-              <TouchableOpacity
-                style={styles.featureCard}
-                onPress={() => router.push('/analytics')}
-              >
-                <View style={styles.featureIcon}>
-                  <Brain size={24} color={colors.nude.roseGold} />
-                </View>
-                <View style={styles.featureContent}>
-                  <Text style={styles.featureTitle}>Predictive Analytics</Text>
-                  <Text style={styles.featureDescription}>
-                    AI-powered fertility predictions and health risk assessment
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.featureCard}
-                onPress={() => router.push('/premium')}
-              >
-                <View style={styles.featureIcon}>
-                  <Sparkles size={24} color={colors.nude.roseGold} />
-                </View>
-                <View style={styles.featureContent}>
-                  <Text style={styles.featureTitle}>Premium Services</Text>
-                  <Text style={styles.featureDescription}>
-                    Virtual consultations, health coaching, and personalized supplements
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
       </View>
     </ScrollView>
   );

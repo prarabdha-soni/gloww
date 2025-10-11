@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Activity, Beaker, ShoppingBag } from 'lucide-react-native';
+import { Home, Activity, Beaker, Phone, Baby } from 'lucide-react-native';
 import { colors } from '@/constants/theme';
 
 export default function TabLayout() {
@@ -49,24 +49,33 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="test"
-        options={{
-          title: 'Test',
-          tabBarIcon: ({ size, color }) => (
-            <Beaker size={size} color={color} strokeWidth={2} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="shop"
-        options={{
-          title: 'Shop',
-          tabBarIcon: ({ size, color }) => (
-            <ShoppingBag size={size} color={color} strokeWidth={2} />
-          ),
-        }}
-      />
+          <Tabs.Screen
+            name="test"
+            options={{
+              title: 'Health',
+              tabBarIcon: ({ size, color }) => (
+                <Beaker size={size} color={color} strokeWidth={2} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="expert"
+            options={{
+              title: 'Expert',
+              tabBarIcon: ({ size, color }) => (
+                <Phone size={size} color={color} strokeWidth={2} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="pregnant"
+            options={{
+              title: 'Pregnant',
+              tabBarIcon: ({ size, color }) => (
+                <Baby size={size} color={color} strokeWidth={2} />
+              ),
+            }}
+          />
     </Tabs>
   );
 }

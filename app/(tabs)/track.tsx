@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Activity, AlertTriangle, Heart, Brain, Zap, Calendar, Baby, Target } from 'lucide-react-native';
+import { ChevronLeft, Activity, AlertTriangle, Heart, Brain, Zap, Calendar, Target } from 'lucide-react-native';
 import ReproductiveSymptomsTracker from '@/components/ReproductiveSymptomsTracker';
 import PredictionEngine from '@/components/PredictionEngine';
 import PeriodCalendar from '@/components/PeriodCalendar';
-import PregnancyTracker from '@/components/PregnancyTracker';
 import PeriodTracker from '@/components/PeriodTracker';
+import OrganStoryline from '@/components/OrganStoryline';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 
 interface Symptom {
@@ -21,7 +21,7 @@ export default function TrackScreen() {
   const router = useRouter();
   const [selectedSymptoms, setSelectedSymptoms] = useState<Symptom[]>([]);
   const [showPrediction, setShowPrediction] = useState(false);
-  const [trackingMode, setTrackingMode] = useState<'symptoms' | 'calendar' | 'pregnancy' | 'period'>('period');
+  const [trackingMode, setTrackingMode] = useState<'symptoms' | 'calendar' | 'period' | 'healing'>('period');
 
   const handleSymptomsChange = (symptoms: Symptom[]) => {
     setSelectedSymptoms(symptoms);
@@ -56,13 +56,6 @@ export default function TrackScreen() {
     console.log('Log data:', date, dataType, value);
   };
 
-  const handleViewMilestones = () => {
-    console.log('View milestones');
-  };
-
-  const handleViewAppointments = () => {
-    console.log('View appointments');
-  };
 
   // Sample data for demonstration
   const cycleHistory = [
@@ -93,19 +86,6 @@ export default function TrackScreen() {
     lhTests: []
   };
 
-  const pregnancyData = {
-    conceptionDate: '2024-01-15',
-    dueDate: '2024-10-22',
-    currentWeek: 12,
-    currentDay: 3,
-    trimester: 1 as const,
-    weightGain: [],
-    symptoms: [],
-    appointments: [],
-    milestones: [],
-    babySize: [],
-    photos: []
-  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -132,6 +112,16 @@ export default function TrackScreen() {
           </Text>
         </TouchableOpacity>
 
+            <TouchableOpacity 
+              style={[styles.modeButton, trackingMode === 'period' && styles.activeModeButton]}
+              onPress={() => setTrackingMode('period')}
+            >
+              <Heart size={20} color={trackingMode === 'period' ? colors.nude.background : colors.nude.text} />
+              <Text style={[styles.modeButtonText, trackingMode === 'period' && styles.activeModeButtonText]}>
+                Period
+              </Text>
+            </TouchableOpacity>
+
         <TouchableOpacity 
           style={[styles.modeButton, trackingMode === 'calendar' && styles.activeModeButton]}
           onPress={() => setTrackingMode('calendar')}
@@ -144,22 +134,12 @@ export default function TrackScreen() {
 
 
             <TouchableOpacity 
-              style={[styles.modeButton, trackingMode === 'pregnancy' && styles.activeModeButton]}
-              onPress={() => setTrackingMode('pregnancy')}
+              style={[styles.modeButton, trackingMode === 'healing' && styles.activeModeButton]}
+              onPress={() => setTrackingMode('healing')}
             >
-              <Baby size={20} color={trackingMode === 'pregnancy' ? colors.nude.background : colors.nude.text} />
-              <Text style={[styles.modeButtonText, trackingMode === 'pregnancy' && styles.activeModeButtonText]}>
-                Pregnancy
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.modeButton, trackingMode === 'period' && styles.activeModeButton]}
-              onPress={() => setTrackingMode('period')}
-            >
-              <Heart size={20} color={trackingMode === 'period' ? colors.nude.background : colors.nude.text} />
-              <Text style={[styles.modeButtonText, trackingMode === 'period' && styles.activeModeButtonText]}>
-                Period
+              <Brain size={20} color={trackingMode === 'healing' ? colors.nude.background : colors.nude.text} />
+              <Text style={[styles.modeButtonText, trackingMode === 'healing' && styles.activeModeButtonText]}>
+                Healing
               </Text>
             </TouchableOpacity>
       </View>
@@ -201,19 +181,23 @@ export default function TrackScreen() {
       )}
 
 
-          {trackingMode === 'pregnancy' && (
-            <PregnancyTracker
-              pregnancyData={pregnancyData}
-              onLogData={handleLogData}
-              onViewMilestones={handleViewMilestones}
-              onViewAppointments={handleViewAppointments}
-            />
-          )}
 
           {trackingMode === 'period' && (
             <PeriodTracker
               userId="demo-user-id" // In real app, get from user context
               onPeriodAdded={() => console.log('Period added')}
+            />
+          )}
+
+          {trackingMode === 'healing' && (
+            <OrganStoryline
+              organHealth={{
+                uterus: { status: 'healing', progress: 30 },
+                ovaries: { status: 'balanced', progress: 75 },
+                thyroid: { status: 'rising', progress: 60 },
+                stress: { status: 'rising', progress: 45 },
+              }}
+              onOrganPress={(organ) => console.log('Organ pressed:', organ)}
             />
           )}
 

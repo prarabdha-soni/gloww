@@ -223,7 +223,7 @@ export default function OrganStoryline({ organHealth, onOrganPress }: OrganStory
             ? "You're thriving beautifully! ✨" 
             : Math.round(Object.values(organHealth).reduce((sum, organ) => sum + organ.progress, 0) / 4) >= 50
             ? "Your healing journey is progressing well 🌱"
-            : "Your body is gently healing and restoring 💫"}
+            : "Your ovaries are asking for rest today 🌸 — take a short walk and hydrate more."}
         </Text>
       </View>
     </View>
