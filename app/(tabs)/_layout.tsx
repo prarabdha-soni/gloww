@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Activity, MessageCircle, Beaker, TrendingUp, ShoppingBag, User } from 'lucide-react-native';
+import { Home, Activity, Beaker, ShoppingBag } from 'lucide-react-native';
 import { colors } from '@/constants/theme';
 
 export default function TabLayout() {
@@ -50,29 +50,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="insights"
-        options={{
-          title: 'Healing',
-          tabBarIcon: ({ size, color }) => (
-            <TrendingUp size={size} color={color} strokeWidth={2} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="shop"
         options={{
           title: 'Shop',
           tabBarIcon: ({ size, color }) => (
             <ShoppingBag size={size} color={color} strokeWidth={2} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ size, color }) => (
-            <User size={size} color={color} strokeWidth={2} />
           ),
         }}
       />
