@@ -191,15 +191,6 @@ export default function HomeScreen() {
             <Text style={styles.actionLabel}>My Cycle</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => router.push('/track')}
-          >
-            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.uterus }]}>
-              <Target size={24} color={colors.nude.background} />
-            </View>
-            <Text style={styles.actionLabel}>Fertility</Text>
-          </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.actionButton}
@@ -225,15 +216,6 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>Your Wellness Journey 💕</Text>
 
         <View style={styles.modesGrid}>
-          <TouchableOpacity
-            style={[styles.modeCard, { backgroundColor: colors.reproductive.uterus }]}
-            onPress={() => router.push('/modes/fertility')}
-          >
-            <Heart size={28} color={colors.nude.background} />
-            <Text style={styles.modeLabel}>Fertility & Conception</Text>
-            <Text style={styles.modeScore}>{organs.find(o => o.name === 'Uterus')?.progress || 0}</Text>
-            <Text style={styles.modeSubtext}>Track your fertile days</Text>
-          </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.modeCard, { backgroundColor: colors.reproductive.ovaries }]}

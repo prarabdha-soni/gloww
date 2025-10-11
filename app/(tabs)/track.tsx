@@ -5,9 +5,7 @@ import { ChevronLeft, Activity, AlertTriangle, Heart, Brain, Zap, Calendar, Baby
 import ReproductiveSymptomsTracker from '@/components/ReproductiveSymptomsTracker';
 import PredictionEngine from '@/components/PredictionEngine';
 import PeriodCalendar from '@/components/PeriodCalendar';
-import FertilityPredictor from '@/components/FertilityPredictor';
 import PregnancyTracker from '@/components/PregnancyTracker';
-import FertileWindowCalendar from '@/components/FertileWindowCalendar';
 import PeriodTracker from '@/components/PeriodTracker';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 
@@ -23,7 +21,7 @@ export default function TrackScreen() {
   const router = useRouter();
   const [selectedSymptoms, setSelectedSymptoms] = useState<Symptom[]>([]);
   const [showPrediction, setShowPrediction] = useState(false);
-  const [trackingMode, setTrackingMode] = useState<'symptoms' | 'calendar' | 'fertility' | 'pregnancy' | 'fertile-window' | 'period'>('period');
+  const [trackingMode, setTrackingMode] = useState<'symptoms' | 'calendar' | 'pregnancy' | 'period'>('period');
 
   const handleSymptomsChange = (symptoms: Symptom[]) => {
     setSelectedSymptoms(symptoms);
@@ -144,25 +142,6 @@ export default function TrackScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.modeButton, trackingMode === 'fertility' && styles.activeModeButton]}
-          onPress={() => setTrackingMode('fertility')}
-        >
-          <Target size={20} color={trackingMode === 'fertility' ? colors.nude.background : colors.nude.text} />
-          <Text style={[styles.modeButtonText, trackingMode === 'fertility' && styles.activeModeButtonText]}>
-            Fertility
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.modeButton, trackingMode === 'fertile-window' && styles.activeModeButton]}
-          onPress={() => setTrackingMode('fertile-window')}
-        >
-          <Target size={20} color={trackingMode === 'fertile-window' ? colors.nude.background : colors.nude.text} />
-          <Text style={[styles.modeButtonText, trackingMode === 'fertile-window' && styles.activeModeButtonText]}>
-            Fertile Window
-          </Text>
-        </TouchableOpacity>
 
             <TouchableOpacity 
               style={[styles.modeButton, trackingMode === 'pregnancy' && styles.activeModeButton]}
@@ -221,23 +200,6 @@ export default function TrackScreen() {
         />
       )}
 
-      {trackingMode === 'fertility' && (
-        <FertilityPredictor
-          cycleHistory={cycleHistory}
-          currentCycleData={currentCycleData}
-          onLogData={handleLogData}
-          onViewInsights={handleViewInsights}
-        />
-      )}
-
-      {trackingMode === 'fertile-window' && (
-        <FertileWindowCalendar
-          cycleHistory={cycleHistory}
-          currentCycleData={currentCycleData}
-          onLogData={handleLogData}
-          onViewInsights={handleViewInsights}
-        />
-      )}
 
           {trackingMode === 'pregnancy' && (
             <PregnancyTracker

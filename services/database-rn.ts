@@ -60,10 +60,6 @@ export interface CyclePhase {
 export interface PeriodPrediction {
   nextPeriodDate: string;
   nextOvulationDate: string;
-  fertileWindow: {
-    start: string;
-    end: string;
-  };
   cyclePhase: CyclePhase;
   confidence: number; // 0-100
   daysUntilPeriod: number;
@@ -738,11 +734,6 @@ export const predictNextPeriod = async (userId: string): Promise<PeriodPredictio
     nextOvulationDate.setDate(nextOvulationDate.getDate() - 14);
     const daysUntilOvulation = Math.ceil((nextOvulationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
-    // Fertile window (5 days before ovulation)
-    const fertileStart = new Date(nextOvulationDate);
-    fertileStart.setDate(fertileStart.getDate() - 5);
-    const fertileEnd = new Date(nextOvulationDate);
-    fertileEnd.setDate(fertileEnd.getDate() + 1);
     
     // Determine current cycle phase
     const cyclePhase = getCurrentCyclePhase(today, lastPeriodDate, statistics.averageCycleLength);
@@ -753,10 +744,6 @@ export const predictNextPeriod = async (userId: string): Promise<PeriodPredictio
     return {
       nextPeriodDate: nextPeriodDate.toISOString().split('T')[0],
       nextOvulationDate: nextOvulationDate.toISOString().split('T')[0],
-      fertileWindow: {
-        start: fertileStart.toISOString().split('T')[0],
-        end: fertileEnd.toISOString().split('T')[0]
-      },
       cyclePhase,
       confidence,
       daysUntilPeriod,
@@ -877,10 +864,10 @@ export const getDailyPrediction = async (userId: string): Promise<any> => {
       message = `Your period is predicted in ${prediction.daysUntilPeriod} days. Time to prepare! 🩸`;
       type = 'period_soon';
     } else if (prediction.daysUntilOvulation === 0) {
-      message = 'You\'re likely ovulating today! Peak fertility window 🌟';
+      message = 'You\'re likely ovulating today! 🌟';
       type = 'ovulation_today';
     } else if (prediction.daysUntilOvulation <= 2) {
-      message = `Ovulation predicted in ${prediction.daysUntilOvulation} days. Fertile window approaching! 🌟`;
+      message = `Ovulation predicted in ${prediction.daysUntilOvulation} days. 🌟`;
       type = 'ovulation_soon';
     } else {
       message = `You're in your ${prediction.cyclePhase.phase} phase. ${prediction.cyclePhase.description}`;
