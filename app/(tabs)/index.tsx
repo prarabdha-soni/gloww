@@ -5,6 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower, Settings, ArrowRight } from 'lucide-react-native';
 import GlowwScore from '@/components/GlowwScore';
 import OrganDashboard from '@/components/OrganDashboard';
+import DailyGlowwCard from '@/components/DailyGlowwCard';
+import OrganStoryline from '@/components/OrganStoryline';
+import MicroChallenges from '@/components/MicroChallenges';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 import { getUserById, getUserOrganHealth } from '@/services/database-rn';
 
@@ -20,6 +23,9 @@ export default function HomeScreen() {
     { name: 'Thyroid', status: 'rising' as const, progress: 60, color: colors.reproductive.thyroid },
     { name: 'Stress', status: 'rising' as const, progress: 45, color: colors.reproductive.stress },
   ]);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'daily' | 'storyline' | 'challenges'>('dashboard');
+  const [cyclePhase, setCyclePhase] = useState<'menstrual' | 'follicular' | 'ovulation' | 'luteal'>('follicular');
+  const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
     loadUserData();
@@ -123,6 +129,27 @@ export default function HomeScreen() {
     }
   };
 
+  const handleReaction = (reaction: string) => {
+    console.log('User reaction:', reaction);
+    // Update user mood data
+  };
+
+  const handleActionSelect = (action: string) => {
+    console.log('Wellness action selected:', action);
+    // Track wellness actions
+  };
+
+  const handleChallengeComplete = (challengeId: string, points: number) => {
+    setTotalPoints(prev => prev + points);
+    console.log('Challenge completed:', challengeId, 'Points:', points);
+    // Update organ health based on challenge completion
+  };
+
+  const handleOrganPress = (organ: string) => {
+    console.log('Organ pressed:', organ);
+    // Navigate to organ details or show organ-specific content
+  };
+
   const renderNewUserWelcome = () => (
     <View style={styles.newUserContainer}>
       <View style={styles.welcomeCard}>
@@ -208,6 +235,52 @@ export default function HomeScreen() {
               Welcome back, {userName}! 💕{'\n'}Your Reproductive Wellness
             </Text>
 
+            {/* Navigation Tabs */}
+            <View style={styles.navigationTabs}>
+              <TouchableOpacity
+                style={[styles.navTab, currentView === 'dashboard' && styles.activeNavTab]}
+                onPress={() => setCurrentView('dashboard')}
+              >
+                <Heart size={20} color={currentView === 'dashboard' ? colors.nude.background : colors.nude.text} />
+                <Text style={[styles.navTabText, currentView === 'dashboard' && styles.activeNavTabText]}>
+                  Dashboard
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.navTab, currentView === 'daily' && styles.activeNavTab]}
+                onPress={() => setCurrentView('daily')}
+              >
+                <Sparkles size={20} color={currentView === 'daily' ? colors.nude.background : colors.nude.text} />
+                <Text style={[styles.navTabText, currentView === 'daily' && styles.activeNavTabText]}>
+                  Today's Gloww
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.navTab, currentView === 'storyline' && styles.activeNavTab]}
+                onPress={() => setCurrentView('storyline')}
+              >
+                <Flower size={20} color={currentView === 'storyline' ? colors.nude.background : colors.nude.text} />
+                <Text style={[styles.navTabText, currentView === 'storyline' && styles.activeNavTabText]}>
+                  Healing Journey
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.navTab, currentView === 'challenges' && styles.activeNavTab]}
+                onPress={() => setCurrentView('challenges')}
+              >
+                <Target size={20} color={currentView === 'challenges' ? colors.nude.background : colors.nude.text} />
+                <Text style={[styles.navTabText, currentView === 'challenges' && styles.activeNavTabText]}>
+                  Challenges
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Content based on current view */}
+            {currentView === 'dashboard' && (
+              <>
                 <GlowwScore
                   score={overallScore}
                   status={getScoreStatus(overallScore)}
@@ -215,6 +288,43 @@ export default function HomeScreen() {
                 />
 
                 <OrganDashboard organs={organs} onOrganPress={handleOrganPress} />
+              </>
+            )}
+
+            {currentView === 'daily' && (
+              <DailyGlowwCard
+                cyclePhase={cyclePhase}
+                lastMood="energized"
+                sleepQuality={7}
+                stressLevel={3}
+                onReaction={handleReaction}
+                onActionSelect={handleActionSelect}
+              />
+            )}
+
+            {currentView === 'storyline' && (
+              <OrganStoryline
+                organHealth={{
+                  uterus: { status: organs[0].status, progress: organs[0].progress },
+                  ovaries: { status: organs[1].status, progress: organs[1].progress },
+                  thyroid: { status: organs[2].status, progress: organs[2].progress },
+                  stress: { status: organs[3].status, progress: organs[3].progress },
+                }}
+                onOrganPress={handleOrganPress}
+              />
+            )}
+
+            {currentView === 'challenges' && (
+              <MicroChallenges
+                organHealth={{
+                  uterus: { status: organs[0].status, progress: organs[0].progress },
+                  ovaries: { status: organs[1].status, progress: organs[1].progress },
+                  thyroid: { status: organs[2].status, progress: organs[2].progress },
+                  stress: { status: organs[3].status, progress: organs[3].progress },
+                }}
+                onChallengeComplete={handleChallengeComplete}
+              />
+            )}
                 
                 {/* Debug button - remove in production */}
                 <TouchableOpacity 
@@ -795,5 +905,39 @@ const styles = StyleSheet.create({
         fontSize: typography.size.sm,
         color: colors.nude.background,
         textAlign: 'center',
+      },
+      navigationTabs: {
+        flexDirection: 'row',
+        backgroundColor: colors.nude.card,
+        borderRadius: borderRadius.lg,
+        padding: spacing.xs,
+        marginBottom: spacing.lg,
+        shadowColor: colors.nude.text,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
+      },
+      navTab: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.sm,
+        borderRadius: borderRadius.md,
+        gap: spacing.xs,
+      },
+      activeNavTab: {
+        backgroundColor: colors.nude.text,
+      },
+      navTabText: {
+        fontFamily: typography.fontFamily.medium,
+        fontSize: typography.size.sm,
+        color: colors.nude.text,
+      },
+      activeNavTabText: {
+        color: colors.nude.background,
+        fontFamily: typography.fontFamily.semibold,
       },
     });
