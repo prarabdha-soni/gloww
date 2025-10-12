@@ -201,47 +201,6 @@ export default function TrackScreen() {
             />
           )}
 
-      {!showPrediction && (
-        <View style={styles.quickInsights}>
-          <Text style={styles.insightsTitle}>Quick Insights</Text>
-          
-          <View style={styles.insightCard}>
-            <View style={styles.insightIcon}>
-              <Activity size={20} color={colors.reproductive.uterus} />
-            </View>
-            <View style={styles.insightContent}>
-              <Text style={styles.insightTitle}>Cycle Tracking</Text>
-              <Text style={styles.insightText}>
-                Track your menstrual cycle patterns to identify irregularities
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.insightCard}>
-            <View style={styles.insightIcon}>
-              <Brain size={20} color={colors.reproductive.thyroid} />
-            </View>
-            <View style={styles.insightContent}>
-              <Text style={styles.insightTitle}>Hormone Balance</Text>
-              <Text style={styles.insightText}>
-                Monitor symptoms that may indicate hormonal imbalances
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.insightCard}>
-            <View style={styles.insightIcon}>
-              <AlertTriangle size={20} color={colors.reproductive.stress} />
-            </View>
-            <View style={styles.insightContent}>
-              <Text style={styles.insightTitle}>Early Detection</Text>
-              <Text style={styles.insightText}>
-                Identify potential conditions like PCOS through symptom patterns
-              </Text>
-            </View>
-          </View>
-        </View>
-      )}
     </ScrollView>
   );
 }
@@ -287,53 +246,6 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
     color: colors.nude.text,
     marginLeft: spacing.xs,
-  },
-  quickInsights: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl + 80, // Add space for tab bar
-  },
-  insightsTitle: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.xl,
-    color: colors.nude.text,
-    marginBottom: spacing.md,
-  },
-  insightCard: {
-    backgroundColor: colors.nude.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-    shadowColor: colors.nude.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  insightIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.nude.peach,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  insightContent: {
-    flex: 1,
-  },
-  insightTitle: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.base,
-    color: colors.nude.text,
-    marginBottom: spacing.xs,
-  },
-  insightText: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.size.sm,
-    color: colors.nude.textSecondary,
-    lineHeight: 20,
   },
   modeSelector: {
     flexDirection: 'row',
