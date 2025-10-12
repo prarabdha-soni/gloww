@@ -5,9 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower, Settings, ArrowRight } from 'lucide-react-native';
 import GlowwScore from '@/components/GlowwScore';
 import OrganDashboard from '@/components/OrganDashboard';
-import DailyGlowwCard from '@/components/DailyGlowwCard';
-import OrganStoryline from '@/components/OrganStoryline';
-import MicroChallenges from '@/components/MicroChallenges';
 import OrganHealingScreen from '@/components/OrganHealingScreen';
 import OrganHealthOverview from '@/components/OrganHealthOverview';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
@@ -25,9 +22,6 @@ export default function HomeScreen() {
     { name: 'Thyroid', status: 'rising' as const, progress: 60, color: colors.reproductive.thyroid },
     { name: 'Stress', status: 'rising' as const, progress: 45, color: colors.reproductive.stress },
   ]);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'daily' | 'challenges'>('dashboard');
-  const [cyclePhase, setCyclePhase] = useState<'menstrual' | 'follicular' | 'ovulation' | 'luteal'>('follicular');
-  const [totalPoints, setTotalPoints] = useState(0);
   const [selectedOrgan, setSelectedOrgan] = useState<string | null>(null);
 
   useEffect(() => {
@@ -128,21 +122,6 @@ export default function HomeScreen() {
     }
   };
 
-  const handleReaction = (reaction: string) => {
-    console.log('User reaction:', reaction);
-    // Update user mood data
-  };
-
-  const handleActionSelect = (action: string) => {
-    console.log('Wellness action selected:', action);
-    // Track wellness actions
-  };
-
-  const handleChallengeComplete = (challengeId: string, points: number) => {
-    setTotalPoints(prev => prev + points);
-    console.log('Challenge completed:', challengeId, 'Points:', points);
-    // Update organ health based on challenge completion
-  };
 
   const handleOrganPress = (organ: string) => {
     console.log('Organ pressed:', organ);
@@ -278,88 +257,12 @@ export default function HomeScreen() {
           )}
 
           <View style={styles.content}>
-        {isNewUser ? (
-          renderNewUserWelcome()
-        ) : (
-          <>
-
-            {/* Navigation Tabs */}
-            <View style={styles.navigationTabs}>
-              <TouchableOpacity
-                style={[styles.navTab, currentView === 'dashboard' && styles.activeNavTab]}
-                onPress={() => setCurrentView('dashboard')}
-              >
-                <Heart size={20} color={currentView === 'dashboard' ? colors.nude.background : colors.nude.text} />
-                <Text style={[styles.navTabText, currentView === 'dashboard' && styles.activeNavTabText]}>
-                  Dashboard
-                </Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={[styles.navTab, currentView === 'daily' && styles.activeNavTab]}
-                onPress={() => setCurrentView('daily')}
-              >
-                <Sparkles size={20} color={currentView === 'daily' ? colors.nude.background : colors.nude.text} />
-                <Text style={[styles.navTabText, currentView === 'daily' && styles.activeNavTabText]}>
-                  Today's Gloww
-                </Text>
-              </TouchableOpacity>
-              
-              
-              <TouchableOpacity
-                style={[styles.navTab, currentView === 'challenges' && styles.activeNavTab]}
-                onPress={() => setCurrentView('challenges')}
-              >
-                <Target size={20} color={currentView === 'challenges' ? colors.nude.background : colors.nude.text} />
-                <Text style={[styles.navTabText, currentView === 'challenges' && styles.activeNavTabText]}>
-                  Challenges
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Content based on current view */}
-            {currentView === 'dashboard' && (
-              <>
-                <GlowwScore
-                  score={overallScore}
-                  status={getScoreStatus(overallScore)}
-                  description={getScoreDescription(overallScore)}
-                />
-
-                <OrganDashboard 
-                  organs={organs} 
-                  onOrganPress={handleOrganPress}
-                  onDashboardPress={handleOrganDashboardPress}
-                />
-              </>
-            )}
-
-            {currentView === 'daily' && (
-              <DailyGlowwCard
-                cyclePhase={cyclePhase}
-                lastMood="energized"
-                sleepQuality={7}
-                stressLevel={3}
-                onReaction={handleReaction}
-                onActionSelect={handleActionSelect}
-              />
-            )}
-
-
-            {currentView === 'challenges' && (
-              <MicroChallenges
-                organHealth={{
-                  uterus: { status: organs[0].status, progress: organs[0].progress },
-                  ovaries: { status: organs[1].status, progress: organs[1].progress },
-                  thyroid: { status: organs[2].status, progress: organs[2].progress },
-                  stress: { status: organs[3].status, progress: organs[3].progress },
-                }}
-                onChallengeComplete={handleChallengeComplete}
-              />
-            )}
-                
-          </>
-        )}
+        {/* Organ Dashboard - Always visible */}
+        <OrganDashboard 
+          organs={organs} 
+          onOrganPress={handleOrganPress}
+          onDashboardPress={handleOrganDashboardPress}
+        />
 
 
 
