@@ -257,6 +257,49 @@ export default function HomeScreen() {
           )}
 
           <View style={styles.content}>
+        {/* Body Energy Dashboard */}
+        <View style={styles.energyHeader}>
+          <Text style={styles.energyTitle}>Body Energy Dashboard</Text>
+          <Text style={styles.energySubtitle}>Tap to view details</Text>
+        </View>
+
+        <View style={styles.innerGlowCard}>
+          <View style={styles.innerGlowLeft}>
+            <View style={styles.ringOuter}>
+              <View style={styles.ringInner}>
+                <Text style={styles.ringLabel}>{overallScore}%</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.innerGlowRight}>
+            <Text style={styles.innerGlowTitle}>Inner Glow</Text>
+            <Text style={styles.innerGlowStatus}>{getScoreStatus(overallScore).split(' ')[0]}</Text>
+          </View>
+        </View>
+
+        {/* Energy facets */}
+        {[
+          { key: 'hormone', label: 'Hormone Flow', emoji: '🌸', color: colors.reproductive.uterus, value: Math.max(30, Math.min(80, Math.round(organs[2].progress * 0.6))) , note: 'Unstable', route: '/dashboards/hormone-flow' },
+          { key: 'energy', label: 'Energy Level', emoji: '🔥', color: colors.semantic.healing, value: Math.max(40, Math.min(95, overallScore)) , note: 'Good', route: '/dashboards/energy-level' },
+          { key: 'calm', label: 'Calm Index', emoji: '🪷', color: colors.semantic.balanced, value: Math.max(45, Math.min(90, 100 - organs[3].progress + 35)) , note: 'Healing', route: '/dashboards/calm-index' },
+          { key: 'repro', label: 'Reproductive Vitality', emoji: '💖', color: colors.reproductive.ovaries, value: Math.round((organs[0].progress + organs[1].progress) / 2) , note: 'Growing', route: '/dashboards/reproductive-vitality' },
+          { key: 'sleep', label: 'Sleep Rhythm', emoji: '🌙', color: colors.nude.peach, value: Math.max(35, Math.min(85, overallScore - 10)) , note: 'Improving', route: '/dashboards/sleep-rhythm' },
+        ].map(item => (
+          <TouchableOpacity key={item.key} activeOpacity={0.8} style={styles.energyItem} onPress={() => router.push(item.route)}>
+            <View style={[styles.energyIcon, { backgroundColor: `${item.color}20` }]}> 
+              <Text style={styles.energyEmoji}>{item.emoji}</Text>
+            </View>
+            <View style={styles.energyContent}>
+              <Text style={styles.energyLabel}>{item.label}</Text>
+              <Text style={styles.energyNote}>{item.note}</Text>
+              <View style={styles.progressBarTrack}>
+                <View style={[styles.progressBarFill, { width: `${item.value}%`, backgroundColor: item.color }]} />
+              </View>
+            </View>
+            <Text style={styles.energyValue}>{item.value}%</Text>
+          </TouchableOpacity>
+        ))}
+
         {/* Organ Dashboard - Always visible */}
         <OrganDashboard 
           organs={organs} 
@@ -300,6 +343,120 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl + 80, // Add space for tab bar
+  },
+  energyHeader: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  energyTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.xxl,
+    color: colors.nude.text,
+  },
+  energySubtitle: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    marginTop: 2,
+  },
+  innerGlowCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  innerGlowLeft: {
+    paddingRight: spacing.md,
+  },
+  ringOuter: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    borderWidth: 10,
+    borderColor: colors.nude.roseGold,
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: 0.9,
+  },
+  ringInner: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    backgroundColor: colors.nude.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ringLabel: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.xxl,
+    color: colors.nude.text,
+  },
+  innerGlowRight: {
+    flex: 1,
+  },
+  innerGlowTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.xl,
+    color: colors.nude.text,
+  },
+  innerGlowStatus: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.base,
+    color: colors.nude.textSecondary,
+    marginTop: 4,
+  },
+  energyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  energyIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: borderRadius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  energyEmoji: {
+    fontSize: 24,
+  },
+  energyContent: {
+    flex: 1,
+  },
+  energyLabel: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+  },
+  energyNote: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.base,
+    color: colors.nude.roseGold,
+    marginTop: 2,
+    marginBottom: 8,
+  },
+  progressBarTrack: {
+    width: '100%',
+    height: 8,
+    borderRadius: 6,
+    backgroundColor: colors.nude.background,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: 8,
+    borderRadius: 6,
+  },
+  energyValue: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+    marginLeft: spacing.md,
   },
   title: {
     fontFamily: typography.fontFamily.semibold,

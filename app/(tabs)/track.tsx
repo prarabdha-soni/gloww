@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Activity, AlertTriangle, Heart, Brain, Zap, Calendar, Target } from 'lucide-react-native';
 import ReproductiveSymptomsTracker from '@/components/ReproductiveSymptomsTracker';
@@ -8,6 +8,7 @@ import PeriodCalendar from '@/components/PeriodCalendar';
 import PeriodTracker from '@/components/PeriodTracker';
 import OrganStoryline from '@/components/OrganStoryline';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
+import { savePeriodData } from '@/services/database-rn';
 
 interface Symptom {
   id: string;
@@ -40,8 +41,32 @@ export default function TrackScreen() {
     console.log('Date pressed:', date, day);
   };
 
-  const handleAddPeriod = (date: Date) => {
-    console.log('Add period:', date);
+  const handleAddPeriod = async (date: Date) => {
+    try {
+      const userId = 'demo-user-id';
+      const start = new Date();
+      const startDate = (date || start).toISOString().split('T')[0];
+      const endDate = new Date((date || start).getTime() + 5 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
+
+      await savePeriodData({
+        userId,
+        startDate,
+        endDate,
+        duration: 5,
+        flow: 'normal',
+        symptoms: ['Cramps', 'Fatigue'],
+        painLevel: 3,
+        mood: 'neutral',
+        notes: 'Logged from calendar (dummy)'
+      });
+
+      Alert.alert('Period Added', 'Dummy period logged for today.');
+    } catch (error) {
+      console.error('Error adding dummy period:', error);
+      Alert.alert('Error', 'Failed to log period.');
+    }
   };
 
   const handleAddSymptom = (date: Date, symptom: string) => {
