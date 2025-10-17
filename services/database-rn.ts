@@ -660,7 +660,45 @@ export const getUserPeriods = async (userId: string): Promise<PeriodData[]> => {
       return allPeriods.filter((period: PeriodData) => period.userId === userId)
         .sort((a: PeriodData, b: PeriodData) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
     }
-    return [];
+    // Seed with dummy periods by default
+    const now = new Date();
+    const format = (d: Date) => d.toISOString().split('T')[0];
+    const start1 = new Date(now); start1.setDate(now.getDate() - 28); // ~one cycle ago
+    const end1 = new Date(start1); end1.setDate(start1.getDate() + 5);
+    const start2 = new Date(now); start2.setDate(now.getDate() - 56); // ~two cycles ago
+    const end2 = new Date(start2); end2.setDate(start2.getDate() + 5);
+
+    const seeded: PeriodData[] = [
+      {
+        _id: generateId(),
+        userId,
+        startDate: format(start1),
+        endDate: format(end1),
+        duration: 5,
+        flow: 'normal',
+        symptoms: ['Cramps'],
+        painLevel: 3,
+        mood: 'neutral',
+        notes: 'Seeded period',
+        createdAt: new Date()
+      },
+      {
+        _id: generateId(),
+        userId,
+        startDate: format(start2),
+        endDate: format(end2),
+        duration: 5,
+        flow: 'light',
+        symptoms: ['Fatigue'],
+        painLevel: 2,
+        mood: 'happy',
+        notes: 'Seeded period',
+        createdAt: new Date()
+      }
+    ];
+
+    await AsyncStorage.setItem('userPeriods', JSON.stringify(seeded));
+    return seeded;
   } catch (error) {
     console.error('Error fetching user periods:', error);
     throw error;
