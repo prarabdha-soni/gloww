@@ -30,6 +30,14 @@ export const colors = {
     balanced: '#A8C8B5',
     rising: '#E8C4A0',
   },
+  menopause: {
+    coral: '#E8916D',
+    sage: '#8BC4A3',
+    lavender: '#A8B8C8',
+    blush: '#E8B4B8',
+    mint: '#A8C8A8',
+    terracotta: '#D4A59A',
+  },
 };
 
 export const typography = {

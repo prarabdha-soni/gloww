@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower, Settings, ArrowRight } from 'lucide-react-native';
+import { Activity, Beaker, ShoppingBag, Lightbulb, Sparkles, Phone, Heart, Brain, Zap, Calendar, Target, Baby, Flower, Settings, ArrowRight, Scale, Leaf, Moon, Wind, Smile, Droplets, ChevronRight } from 'lucide-react-native';
 import GlowwScore from '@/components/GlowwScore';
 import OrganDashboard from '@/components/OrganDashboard';
 import OrganHealingScreen from '@/components/OrganHealingScreen';
@@ -247,68 +247,100 @@ export default function HomeScreen() {
     }
   }
 
+  // Health goals configuration
+  const healthGoals = [
+    {
+      id: 'perimenopause',
+      title: 'Ease perimenopause',
+      titleGray: 'Ease',
+      titleColored: 'perimenopause',
+      icon: Droplets,
+      color: '#E8B4B8',
+      backgroundColor: '#FDF5F6',
+      route: '/modes/hormones',
+      popular: false,
+    },
+    {
+      id: 'menopause',
+      title: 'Relieve menopause',
+      titleGray: 'Relieve',
+      titleColored: 'menopause',
+      icon: Wind,
+      color: '#D4A59A',
+      backgroundColor: '#FAF5F3',
+      route: '/modes/stress',
+      popular: false,
+    },
+    {
+      id: 'reproductive',
+      title: 'Heal reproductive organ',
+      titleGray: 'Heal reproductive',
+      titleColored: 'organ',
+      icon: Heart,
+      color: '#E8B4B8',
+      backgroundColor: '#FEF6F7',
+      route: '/modes/hormones',
+      popular: false,
+    },
+    {
+      id: 'hormones',
+      title: 'Fix hormones',
+      titleGray: 'Fix',
+      titleColored: 'hormones',
+      icon: Zap,
+      color: '#A8B8C8',
+      backgroundColor: '#F3F5F8',
+      route: '/modes/hormones',
+      popular: false,
+    },
+  ];
+
   return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-          {isNewUser && (
-            <View style={styles.header}>
-              <Text style={styles.logo}>Gloww</Text>
-              <Text style={styles.tagline}>Where reproductive balance begins — naturally, scientifically, beautifully.</Text>
-            </View>
-          )}
-
           <View style={styles.content}>
-        {/* Body Energy Dashboard */}
-        <View style={styles.energyHeader}>
-          <Text style={styles.energyTitle}>Body Energy Dashboard</Text>
-          <Text style={styles.energySubtitle}>Tap to view details</Text>
+        {/* Hero Section */}
+        <View style={styles.heroSection}>
+          <Text style={styles.heroTitle}>
+            <Text style={styles.heroTitleMain}>Female care</Text>
+          </Text>
+          <Text style={styles.heroSubtitle}>personalized to you</Text>
+          <Text style={styles.heroTagline}>Customized care starts here</Text>
         </View>
 
-        <View style={styles.innerGlowCard}>
-          <View style={styles.innerGlowLeft}>
-            <View style={styles.ringOuter}>
-              <View style={styles.ringInner}>
-                <Text style={styles.ringLabel}>{overallScore}%</Text>
+        {/* Health Goals Cards */}
+        <View style={styles.goalsContainer}>
+          {healthGoals.map((goal) => (
+            <TouchableOpacity
+              key={goal.id}
+              style={[styles.goalCard, { backgroundColor: goal.backgroundColor }]}
+              onPress={() => router.push(goal.route as any)}
+              activeOpacity={0.7}
+            >
+              {goal.popular && (
+                <View style={styles.popularBadge}>
+                  <Text style={styles.popularText}>Popular</Text>
+                </View>
+              )}
+              
+              <View style={styles.goalContent}>
+                <Text style={styles.goalTitle}>
+                  <Text style={styles.goalTitleGray}>{goal.titleGray} </Text>
+                  <Text style={[styles.goalTitleColored, { color: goal.color }]}>
+                    {goal.titleColored}
+                  </Text>
+                </Text>
               </View>
-            </View>
-          </View>
-          <View style={styles.innerGlowRight}>
-            <Text style={styles.innerGlowTitle}>Inner Glow</Text>
-            <Text style={styles.innerGlowStatus}>{getScoreStatus(overallScore).split(' ')[0]}</Text>
-          </View>
+
+              <View style={[styles.goalIconContainer, { backgroundColor: goal.color + '30' }]}>
+                <goal.icon size={48} color={goal.color} strokeWidth={1.5} />
+              </View>
+
+              <View style={styles.goalArrow}>
+                <ChevronRight size={24} color={colors.nude.textSecondary} />
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
-
-        {/* Energy facets */}
-        {[
-          { key: 'hormone', label: 'Hormone Flow', emoji: '🌸', color: colors.reproductive.uterus, value: Math.max(30, Math.min(80, Math.round(organs[2].progress * 0.6))) , note: 'Unstable', route: '/dashboards/hormone-flow' },
-          { key: 'energy', label: 'Energy Level', emoji: '🔥', color: colors.semantic.healing, value: Math.max(40, Math.min(95, overallScore)) , note: 'Good', route: '/dashboards/energy-level' },
-          { key: 'calm', label: 'Calm Index', emoji: '🪷', color: colors.semantic.balanced, value: Math.max(45, Math.min(90, 100 - organs[3].progress + 35)) , note: 'Healing', route: '/dashboards/calm-index' },
-          { key: 'repro', label: 'Reproductive Vitality', emoji: '💖', color: colors.reproductive.ovaries, value: Math.round((organs[0].progress + organs[1].progress) / 2) , note: 'Growing', route: '/dashboards/reproductive-vitality' },
-          { key: 'sleep', label: 'Sleep Rhythm', emoji: '🌙', color: colors.nude.peach, value: Math.max(35, Math.min(85, overallScore - 10)) , note: 'Improving', route: '/dashboards/sleep-rhythm' },
-        ].map(item => (
-          <TouchableOpacity key={item.key} activeOpacity={0.8} style={styles.energyItem} onPress={() => router.push(item.route)}>
-            <View style={[styles.energyIcon, { backgroundColor: `${item.color}20` }]}> 
-              <Text style={styles.energyEmoji}>{item.emoji}</Text>
-            </View>
-            <View style={styles.energyContent}>
-              <Text style={styles.energyLabel}>{item.label}</Text>
-              <Text style={styles.energyNote}>{item.note}</Text>
-              <View style={styles.progressBarTrack}>
-                <View style={[styles.progressBarFill, { width: `${item.value}%`, backgroundColor: item.color }]} />
-              </View>
-            </View>
-            <Text style={styles.energyValue}>{item.value}%</Text>
-          </TouchableOpacity>
-        ))}
-
-        {/* Organ Dashboard - Always visible */}
-        <OrganDashboard 
-          organs={organs} 
-          onOrganPress={handleOrganPress}
-          onDashboardPress={handleOrganDashboardPress}
-        />
-
-
-
 
 
       </View>
@@ -321,386 +353,209 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.nude.background,
   },
-  header: {
-    paddingTop: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  logo: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.xl,
-    color: colors.nude.text,
-    letterSpacing: 0.5,
-  },
-  tagline: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.size.sm,
-    color: colors.nude.textSecondary,
-    marginTop: spacing.xs,
-    lineHeight: 20,
-    fontStyle: 'italic',
-  },
   content: {
+    paddingTop: spacing.xl,
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl + 80, // Add space for tab bar
+    paddingBottom: spacing.xl + 80,
   },
-  energyHeader: {
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  energyTitle: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.xxl,
-    color: colors.nude.text,
-  },
-  energySubtitle: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.size.sm,
-    color: colors.nude.textSecondary,
-    marginTop: 2,
-  },
-  innerGlowCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.nude.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  innerGlowLeft: {
-    paddingRight: spacing.md,
-  },
-  ringOuter: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-    borderWidth: 10,
-    borderColor: colors.nude.roseGold,
-    justifyContent: 'center',
-    alignItems: 'center',
-    opacity: 0.9,
-  },
-  ringInner: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    backgroundColor: colors.nude.background,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  ringLabel: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.xxl,
-    color: colors.nude.text,
-  },
-  innerGlowRight: {
-    flex: 1,
-  },
-  innerGlowTitle: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.xl,
-    color: colors.nude.text,
-  },
-  innerGlowStatus: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.size.base,
-    color: colors.nude.textSecondary,
-    marginTop: 4,
-  },
-  energyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.nude.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  energyIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: borderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  energyEmoji: {
-    fontSize: 24,
-  },
-  energyContent: {
-    flex: 1,
-  },
-  energyLabel: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.lg,
-    color: colors.nude.text,
-  },
-  energyNote: {
-    fontFamily: typography.fontFamily.medium,
-    fontSize: typography.size.base,
-    color: colors.nude.roseGold,
-    marginTop: 2,
-    marginBottom: 8,
-  },
-  progressBarTrack: {
-    width: '100%',
-    height: 8,
-    borderRadius: 6,
-    backgroundColor: colors.nude.background,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: 8,
-    borderRadius: 6,
-  },
-  energyValue: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.lg,
-    color: colors.nude.text,
-    marginLeft: spacing.md,
-  },
-  title: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.xxxl,
-    color: colors.nude.text,
-    lineHeight: 38,
+  // Hero Section Styles
+  heroSection: {
     marginBottom: spacing.xl,
   },
-  scoreContainer: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-    paddingVertical: spacing.lg,
-  },
-  tipCard: {
-    backgroundColor: colors.nude.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-    shadowColor: colors.nude.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  tipIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.nude.peach,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  tipContent: {
-    flex: 1,
-  },
-  tipTitle: {
-    fontFamily: typography.fontFamily.medium,
-    fontSize: typography.size.sm,
-    color: colors.nude.textSecondary,
+  heroTitle: {
     marginBottom: spacing.xs,
   },
-  tipText: {
+  heroTitleMain: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: 36,
+    color: '#E8916D',
+    letterSpacing: -0.5,
+  },
+  heroSubtitle: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.xxxl,
+    color: colors.nude.text,
+    marginBottom: spacing.md,
+    letterSpacing: -0.5,
+  },
+  heroTagline: {
     fontFamily: typography.fontFamily.regular,
     fontSize: typography.size.base,
-    color: colors.nude.text,
-    lineHeight: 22,
+    color: colors.nude.textSecondary,
   },
-  quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  // Health Goals Cards
+  goalsContainer: {
+    gap: spacing.md,
     marginBottom: spacing.xl,
   },
-  actionButton: {
-    alignItems: 'center',
-    flex: 1,
+  goalCard: {
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    minHeight: 120,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
-  actionIcon: {
+  popularBadge: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    backgroundColor: '#5F8A6F',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.md,
+    zIndex: 10,
+  },
+  popularText: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.sm,
+    color: '#FFFFFF',
+  },
+  goalContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  goalTitle: {
+    fontSize: typography.size.xl,
+    lineHeight: 28,
+  },
+  goalTitleGray: {
+    fontFamily: typography.fontFamily.regular,
+    color: colors.nude.textSecondary,
+  },
+  goalTitleColored: {
+    fontFamily: typography.fontFamily.semibold,
+  },
+  goalIconContainer: {
+    position: 'absolute',
+    right: 60,
+    top: '50%',
+    marginTop: -32,
     width: 64,
     height: 64,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.nude.card,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.sm,
-    shadowColor: colors.nude.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
   },
-  actionLabel: {
-    fontFamily: typography.fontFamily.medium,
-    fontSize: typography.size.sm,
-    color: colors.nude.text,
+  goalArrow: {
+    position: 'absolute',
+    right: spacing.lg,
+    top: '50%',
+    marginTop: -12,
+  },
+  // Tracking Section
+  trackingSection: {
+    marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontFamily: typography.fontFamily.semibold,
     fontSize: typography.size.xl,
     color: colors.nude.text,
-    marginBottom: spacing.md,
-    marginTop: spacing.lg,
+    marginBottom: spacing.xs,
   },
-  modesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.xl,
+  sectionSubtitle: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    marginBottom: spacing.lg,
   },
-  modeCard: {
-    flex: 1,
-    minWidth: '48%',
+  trackingCard: {
+    backgroundColor: colors.nude.card,
     borderRadius: borderRadius.lg,
-    padding: spacing.md,
+    padding: spacing.lg,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 140,
-    shadowColor: colors.nude.text,
+    marginBottom: spacing.md,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
   },
-  modeEmoji: {
-    fontSize: 32,
-    marginBottom: spacing.sm,
+  trackingCardLeft: {
+    marginRight: spacing.md,
   },
-  modeLabel: {
-    fontFamily: typography.fontFamily.medium,
-    fontSize: typography.size.sm,
-    color: colors.nude.text,
-    marginTop: spacing.sm,
-    marginBottom: spacing.xs,
+  scoreCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.nude.roseGold + '20',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: colors.nude.roseGold,
   },
-  modeScore: {
+  scoreNumber: {
     fontFamily: typography.fontFamily.semibold,
     fontSize: typography.size.xxl,
-    color: colors.nude.background,
-    marginTop: spacing.xs,
+    color: colors.nude.text,
   },
-  modeSubtext: {
+  scoreLabel: {
     fontFamily: typography.fontFamily.regular,
     fontSize: typography.size.xs,
-    color: colors.nude.background,
-    opacity: 0.8,
-    marginTop: spacing.xs,
-    textAlign: 'center',
+    color: colors.nude.textSecondary,
   },
-  expertCallCard: {
+  trackingCardRight: {
+    flex: 1,
+  },
+  trackingCardTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+    marginBottom: spacing.xs,
+  },
+  trackingCardSubtitle: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+  },
+  // Metrics Cards
+  metricCard: {
     backgroundColor: colors.nude.card,
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.xl,
-    shadowColor: colors.nude.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    marginBottom: spacing.sm,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
   },
-  expertCallIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.nude.roseGold,
-    justifyContent: 'center',
-    alignItems: 'center',
+  metricEmoji: {
+    fontSize: 28,
     marginRight: spacing.md,
   },
-  expertCallContent: {
+  metricContent: {
     flex: 1,
   },
-  expertCallTitle: {
+  metricLabel: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    marginBottom: spacing.sm,
+  },
+  metricBar: {
+    height: 6,
+    backgroundColor: colors.nude.background,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  metricBarFill: {
+    height: 6,
+    borderRadius: 3,
+  },
+  metricValue: {
     fontFamily: typography.fontFamily.semibold,
     fontSize: typography.size.base,
     color: colors.nude.text,
-    marginBottom: spacing.xs,
+    marginLeft: spacing.md,
   },
-  expertCallSubtitle: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.size.sm,
-    color: colors.nude.textSecondary,
-    lineHeight: 20,
-  },
-  newFeaturesSection: {
-    marginTop: spacing.xl,
-  },
-  featureCard: {
-    backgroundColor: colors.nude.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: colors.nude.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  featureIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.nude.peach,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  featureContent: {
-    flex: 1,
-  },
-  featureTitle: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.base,
-    color: colors.nude.text,
-    marginBottom: spacing.xs,
-  },
-  featureDescription: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.size.sm,
-    color: colors.nude.textSecondary,
-    lineHeight: 20,
-  },
-  pregnancyCard: {
-    backgroundColor: colors.nude.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-    shadowColor: colors.nude.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  pregnancyIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.reproductive.uterus,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  pregnancyContent: {
-    flex: 1,
-  },
-  pregnancyTitle: {
-    fontFamily: typography.fontFamily.semibold,
-    fontSize: typography.size.base,
-    color: colors.nude.text,
-    marginBottom: spacing.xs,
-  },
-  pregnancySubtitle: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.size.sm,
-    color: colors.nude.textSecondary,
-    lineHeight: 20,
-  },
+  // Onboarding Styles (keep for new users)
   newUserContainer: {
     paddingBottom: spacing.xl,
   },
@@ -838,51 +693,18 @@ const styles = StyleSheet.create({
         marginTop: spacing.md,
         lineHeight: 18,
       },
-      debugButton: {
-        backgroundColor: colors.semantic.error,
-        borderRadius: borderRadius.md,
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.md,
-        marginTop: spacing.md,
-      },
-      debugButtonText: {
-        fontFamily: typography.fontFamily.medium,
-        fontSize: typography.size.sm,
-        color: colors.nude.background,
-        textAlign: 'center',
-      },
-      navigationTabs: {
-        flexDirection: 'row',
-        backgroundColor: colors.nude.card,
-        borderRadius: borderRadius.lg,
-        padding: spacing.xs,
-        marginBottom: spacing.lg,
-        shadowColor: colors.nude.text,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
-      },
-      navTab: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.sm,
-        borderRadius: borderRadius.md,
-        gap: spacing.xs,
-      },
-      activeNavTab: {
-        backgroundColor: colors.nude.text,
-      },
-      navTabText: {
-        fontFamily: typography.fontFamily.medium,
-        fontSize: typography.size.sm,
-        color: colors.nude.text,
-      },
-      activeNavTabText: {
-        color: colors.nude.background,
-        fontFamily: typography.fontFamily.semibold,
-      },
-    });
+  debugButton: {
+    backgroundColor: colors.semantic.error,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.md,
+  },
+  debugButtonText: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.sm,
+    color: colors.nude.background,
+    textAlign: 'center',
+  },
+});
+
