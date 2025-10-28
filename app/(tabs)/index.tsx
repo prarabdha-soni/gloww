@@ -300,14 +300,60 @@ export default function HomeScreen() {
           <View style={styles.content}>
         {/* Hero Section */}
         <View style={styles.heroSection}>
+          <Text style={styles.heroGreeting}>Welcome back, {userName || 'Beautiful'}</Text>
           <Text style={styles.heroTitle}>
             <Text style={styles.heroTitleMain}>Female care</Text>
           </Text>
           <Text style={styles.heroSubtitle}>personalized to you</Text>
-          <Text style={styles.heroTagline}>Customized care starts here</Text>
+          <Text style={styles.heroTagline}>Your personalized health journey starts here</Text>
         </View>
 
-        {/* Health Goals Cards */}
+        {/* Journey Progress Card */}
+        <View style={styles.journeyCard}>
+          <View style={styles.journeyHeader}>
+            <Text style={styles.journeyTitle}>Your Health Journey</Text>
+            <TouchableOpacity onPress={handleOrganDashboardPress}>
+              <Text style={styles.journeyViewAll}>View All</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.journeyProgressSection}>
+            <View style={styles.journeyScoreCircle}>
+              <Text style={styles.journeyScoreNumber}>{overallScore}</Text>
+              <Text style={styles.journeyScoreLabel}>Score</Text>
+            </View>
+            <View style={styles.journeyInfo}>
+              <Text style={styles.journeyStatus}>{getScoreStatus(overallScore)}</Text>
+              <Text style={styles.journeyDescription}>{getScoreDescription(overallScore)}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Today's Focus */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Today's Focus</Text>
+        </View>
+        
+        <TouchableOpacity 
+          style={styles.focusCard}
+          onPress={() => router.push('/dashboards/hormone-flow' as any)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.focusIconContainer}>
+            <Flower size={24} color={colors.reproductive.uterus} />
+          </View>
+          <View style={styles.focusContent}>
+            <Text style={styles.focusTitle}>Track Your Cycle</Text>
+            <Text style={styles.focusSubtitle}>Log your symptoms and mood today</Text>
+          </View>
+          <ChevronRight size={20} color={colors.nude.textSecondary} />
+        </TouchableOpacity>
+
+        {/* Health Goals Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Your Health Goals</Text>
+          <Text style={styles.sectionSubtitle}>Personalized care plans for your wellness</Text>
+        </View>
+
         <View style={styles.goalsContainer}>
           {healthGoals.map((goal) => (
             <TouchableOpacity
@@ -342,6 +388,46 @@ export default function HomeScreen() {
           ))}
         </View>
 
+        {/* Quick Actions */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+        </View>
+
+        <View style={styles.quickActions}>
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => router.push('/(tabs)/track' as any)}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: colors.reproductive.ovaries + '20' }]}>
+              <Calendar size={24} color={colors.reproductive.ovaries} />
+            </View>
+            <Text style={styles.actionLabel}>Period</Text>
+            <Text style={styles.actionSubtext}>Track cycle</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => router.push('/(tabs)/test' as any)}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: colors.semantic.healing + '20' }]}>
+              <Beaker size={24} color={colors.semantic.healing} />
+            </View>
+            <Text style={styles.actionLabel}>Lab Tests</Text>
+            <Text style={styles.actionSubtext}>Check health</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => router.push('/(tabs)/expert' as any)}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: colors.nude.roseGold + '20' }]}>
+              <Phone size={24} color={colors.nude.roseGold} />
+            </View>
+            <Text style={styles.actionLabel}>Expert</Text>
+            <Text style={styles.actionSubtext}>Consult now</Text>
+          </TouchableOpacity>
+        </View>
+
 
       </View>
     </ScrollView>
@@ -362,6 +448,12 @@ const styles = StyleSheet.create({
   heroSection: {
     marginBottom: spacing.xl,
   },
+  heroGreeting: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.base,
+    color: colors.nude.textSecondary,
+    marginBottom: spacing.sm,
+  },
   heroTitle: {
     marginBottom: spacing.xs,
   },
@@ -381,6 +473,161 @@ const styles = StyleSheet.create({
   heroTagline: {
     fontFamily: typography.fontFamily.regular,
     fontSize: typography.size.base,
+    color: colors.nude.textSecondary,
+  },
+  // Journey Card
+  journeyCard: {
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  journeyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  journeyTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.lg,
+    color: colors.nude.text,
+  },
+  journeyViewAll: {
+    fontFamily: typography.fontFamily.medium,
+    fontSize: typography.size.sm,
+    color: colors.nude.roseGold,
+  },
+  journeyProgressSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  journeyScoreCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.nude.roseGold + '15',
+    borderWidth: 3,
+    borderColor: colors.nude.roseGold,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  journeyScoreNumber: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.xxl,
+    color: colors.nude.text,
+  },
+  journeyScoreLabel: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.xs,
+    color: colors.nude.textSecondary,
+    marginTop: 2,
+  },
+  journeyInfo: {
+    flex: 1,
+  },
+  journeyStatus: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    marginBottom: spacing.xs,
+  },
+  journeyDescription: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    lineHeight: 20,
+  },
+  // Section Headers
+  sectionHeader: {
+    marginBottom: spacing.md,
+  },
+  sectionSubtitle: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+    marginTop: spacing.xs,
+  },
+  // Focus Card
+  focusCard: {
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.reproductive.uterus,
+  },
+  focusIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.reproductive.uterus + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  focusContent: {
+    flex: 1,
+  },
+  focusTitle: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.base,
+    color: colors.nude.text,
+    marginBottom: spacing.xs,
+  },
+  focusSubtitle: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.sm,
+    color: colors.nude.textSecondary,
+  },
+  // Quick Actions
+  quickActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: spacing.xl,
+  },
+  actionCard: {
+    flex: 1,
+    backgroundColor: colors.nude.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  actionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: borderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  actionLabel: {
+    fontFamily: typography.fontFamily.semibold,
+    fontSize: typography.size.sm,
+    color: colors.nude.text,
+    marginBottom: spacing.xs,
+  },
+  actionSubtext: {
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.size.xs,
     color: colors.nude.textSecondary,
   },
   // Health Goals Cards

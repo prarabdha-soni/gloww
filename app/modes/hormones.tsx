@@ -1,12 +1,18 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Brain, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react-native';
+import { Brain, TrendingUp, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import CircularProgress from '@/components/CircularProgress';
 import { colors, typography, spacing, borderRadius } from '@/constants/theme';
 
 export default function HormonesMode() {
+  const router = useRouter();
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <ArrowLeft size={24} color={colors.nude.text} />
+        </TouchableOpacity>
         <Text style={styles.title}>Hormones Mode</Text>
         <Text style={styles.subtitle}>Monitor your hormonal balance and reproductive health</Text>
       </View>
@@ -90,6 +96,20 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xxl + spacing.md,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.nude.card,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    shadowColor: colors.nude.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   title: {
     fontFamily: typography.fontFamily.semibold,
